@@ -1,5 +1,6 @@
 #ifndef BACKEND_H
 #define BACKEND_H
+#include <stdbool.h>
 
 #define ROOTNAME "admin";
 
