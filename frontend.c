@@ -8,7 +8,12 @@
 
 int main(int argc, char **argv) {
 
-    /*CODE*/
+    //setup input verification
+    if(argc < 3){
+        printf(WRONG_INPUT);
+        exit(1);
+    }
+
 
     return 0;
 }
