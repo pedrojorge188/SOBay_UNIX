@@ -13,5 +13,5 @@ backend:$(backend_files)
 	gcc backend.c -o backend
 
 clean: ./frontend ./backend
-	rm ./frontend ./backend
+	rm -f ./frontend ./backend
 
