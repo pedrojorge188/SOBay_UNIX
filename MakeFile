@@ -1,1 +1,25 @@
 
+<<<<<<< Updated upstream
+=======
+frontend_files = ./frontend.h ./frontend.c 
+backend_files = ./backend.h ./backend.c 
+path=src
+
+# all -> compiles every file at same time
+all:frontend backend
+	@echo "all files compiled ..."
+ 
+# frontend -> compiles only frontend files
+frontend:$(frontend_files)
+	gcc ./src/frontend.c -o ./frontend 
+	@echo "frontend files compiled ..."
+
+# backend -> compiles only backend files
+backend:$(backend_files)
+	gcc backend.c -o backend
+	@echo "backend files compiled ..."
+
+clean:
+	rm frontend backend
+
+>>>>>>> Stashed changes
