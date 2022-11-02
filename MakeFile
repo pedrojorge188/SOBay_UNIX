@@ -1,22 +1,17 @@
 
 frontend_files = ./frontend.h ./frontend.c 
 backend_files = ./backend.h ./backend.c 
-path=src
 
-# all -> compiles every file at same time
-all:frontend backend
-	@echo "all files compiled ..."
 
-# frontend -> compiles only frontend files
+all: frontend backend
+
 frontend:$(frontend_files)
 	gcc ./frontend.c -o ./frontend 
-	@echo "frontend files compiled ..."
 
-# backend -> compiles only backend files
+
 backend:$(backend_files)
 	gcc backend.c -o backend
-	@echo "backend files compiled ..."
 
-clean:
-	rm frontend backend
+clean: ./frontend ./backend
+	rm ./frontend ./backend
 
