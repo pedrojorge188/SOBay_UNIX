@@ -1,6 +1,7 @@
 
 frontend_files = ./frontend.h ./frontend.c 
 backend_files = ./backend.h ./backend.c 
+path=src
 
 # all -> compiles every file at same time
 all:frontend backend
