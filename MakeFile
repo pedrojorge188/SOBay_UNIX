@@ -1,17 +1,20 @@
+path = src
+cc = gcc
 
-frontend_files = ./frontend.h ./frontend.c 
-backend_files = ./backend.h ./backend.c 
+all:backend frontend
+	@echo "Successful complilation!"
+
+backend: ${path}/backend.c ${path}/backend.h
+	${cc} ${path}/backend.c  -o backend
+	@echo "Successful complilation of backend!"
+
+frontend: ${path}/frontend.c ${path}/frontend.h
+	${cc} ${path}/frontend.c  -o frontend
+	@echo "Successful complilation of frontend!"
+
+clean:
+	rm backend frontend 
+	@echo "Files deleted Successfully!"
 
 
-all: frontend backend
-
-frontend:$(frontend_files)
-	gcc ./frontend.c -o ./frontend 
-
-
-backend:$(backend_files)
-	gcc backend.c -o backend
-
-clean: ./frontend ./backend
-	rm -f ./frontend ./backend
 

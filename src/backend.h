@@ -12,7 +12,7 @@ typedef struct client{
     int *id_own_items;
     int money;
     bool connection;
-    client *pnext;
+    //client *pnext;
 }client;
 
 typedef struct items{
@@ -24,7 +24,7 @@ typedef struct items{
     int id_owner;
     bool sell_state;
     int time_left;
-    items *pnext;
+    //items *pnext;
 }items;
 
 
