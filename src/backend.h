@@ -6,9 +6,6 @@
 #define VALID 1
 
 
-//Global Variables
-const char SPACE = {" "};
-
 /*Setup all data structs*/
 typedef struct client{
     int user_pid;
@@ -32,14 +29,6 @@ typedef struct items{
     //items *pnext;
 }items;
 
-//Command list for Developer, to use in verifications
-typedef struct comdev{
-    char *list[] = {"users", "list", "kick", "prom", "reprom", "cancel", "close"};
-    int list_numb[] = {0, 0, 1, 0, 0, 1, 0};
-}comdev
-
-//Verify function
-int cmmChecker (char cmm);
 
 
 #endif

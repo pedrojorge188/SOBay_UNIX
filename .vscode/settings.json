@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "unistd.h": "c",
-        "frontend.h": "c"
+        "frontend.h": "c",
+        "stdbool.h": "c"
     }
 }
