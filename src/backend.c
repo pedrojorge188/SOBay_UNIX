@@ -5,32 +5,73 @@
 
 #include "backend.h"
 
+int cmmChecker (char cmm){
+    comdev Dev;
 
-int main() {
-    char command[250];
-    char *list[] = {"users", "list", "kick", "prom", "reprom", "cancel", "close"};
-    int number[] = {0, 0, 1, 0, 0, 1, 0};
-    const char delim[] = {" "};
     char *token;
-    int ind = 0;
-
-    printf("Espeta ai o comando: \n");
-    scanf("%[^\n]", command);
-
-    token = strtok(command, delim);
-    printf ("%s\n", token);
+    int indx = -1;
+    
+    token = strtok(cmm, SPACE);
 
     for (int i = 0; i < 7; i++){
-        if(strcmp(token, list[i])==0){
-            ind = i;
+        if(strcmp(token, Dev.list[i])==0){
+            indx = i;
         }
     }
 
-    for(int i = 0; i < number[ind]; i++ ){
-        token = strtok(NULL, delim);
-        printf ("%s\n", token);
+    switch (indx){
+        case (-1):
+            printf("Introduced command was not recognized!");
+            return 2; //command list error
+            break;
 
+        case (0):
+            printf("Introduced command was not recognized!");
+            return 2; //command list error
+            break;
+
+        case (1):
+            printf("Introduced command was not recognized!");
+            return 2; //command list error
+            break;
+
+        case (2):
+            printf("Introduced command was not recognized!");
+            return 2; //command list error
+            break;
+
+        case (3):
+            printf("Introduced command was not recognized!");
+            return 2; //command list error
+            break;
+
+        case (4):
+            printf("Introduced command was not recognized!");
+            return 2; //command list error
+            break;
+
+        case (5):
+            printf("Introduced command was not recognized!");
+            return 2; //command list error
+            break; 
+
+        case (6):
+            printf("Introduced command was not recognized!");
+            return 2; //command list error
+            break;
     }
+
+}
+
+
+
+int main() {
+    char CMM[250];
+
+    printf("Espeta ai o comando: \n");
+    scanf("%[^\n]", CMM);
+
+
 
 
 
