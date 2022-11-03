@@ -7,7 +7,7 @@
 /*Setup all data structs*/
 typedef struct client{
     int user_pid;
-    char **name;
+    char *name;
     int password;
     int *id_own_items;
     int money;
@@ -17,8 +17,8 @@ typedef struct client{
 
 typedef struct items{
     int id;
-    char **name;
-    char **category;
+    char *name;
+    char *category;
     int buy_now_price;
     int main_price;
     int id_owner;
