@@ -10,6 +10,13 @@
 #define LOGIN_ERROR "THE DATA ENTERED IS NOT CORRECT!\n";
 #define KICK_LOG "YOU HAVE BEEN KICKED FROM YOUR SESSION!\n";
 #define WRONG_INPUT "ENTER THE CORRECT INPUT (file name password)!\n"
+#define WRONG_COMMAND "COMMAND (%s) IS NOT CORRECT!\n"
+
+//Global Commands defualts
+
+char *LIST[] = {"sell", "list", "licat", "lisel", "lival", "litime", "time" , "buy", "add","exit"};
+int LIST_INDEX[] = {5, 0, 1, 1, 1, 1, 0, 3 ,1 ,0};
+char DELIM[] = {" "};
 
 /*Setup all data structs*/
 typedef struct user{
@@ -24,7 +31,7 @@ typedef struct tryLogin{
     char *psw;
 }tryLogin;
 
-void list_users(char *msg);
+int setup_command(char *command);
 
 #endif
 
