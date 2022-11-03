@@ -1,8 +1,9 @@
 #ifndef BACKEND_H
 #define BACKEND_H
-#include <stdbool.h>
 
+#include <stdbool.h>
 #define ROOTNAME "admin";
+#define VALID 1
 
 /*Setup all data structs*/
 typedef struct client{
