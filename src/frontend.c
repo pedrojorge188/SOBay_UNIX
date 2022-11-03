@@ -3,7 +3,7 @@
 #include <string.h>
 #include <signal.h>
 #include <unistd.h>
-
+#include <stdlib.h>
 #include "frontend.h"
 
 int main(int argc, char **argv) {
@@ -27,9 +27,7 @@ int main(int argc, char **argv) {
     printf("ACCOUNT(pid:%d|username:%s|password:%s) \n",
     login.my_pid, login.username, login.psw );
 
-    for(;;){
-        
-        fflush(stdin);
+    while(VALID){
 
         int result_command;
         printf("cmd > : ");
@@ -37,37 +35,53 @@ int main(int argc, char **argv) {
         
         result_command = setup_command(command);
 
-        break;    
+        setbuf(stdin,NULL);
     }
+
     return 0;
 }
 
 int setup_command(char *command){
         
         char *token;
-        int ind = 0;
-        int counter = 1;
+        int ind = -1;
+        int any = 0;
+        int counter1 = 0;
+        int counter2 = 0;
 
         token = strtok(command, DELIM);
-        //printf ("%s\n", token);
+        
+        if(strcmp(token,"exit") == 0){
+             sleep(1);
+             printf("Closing ...\n");
+             exit(1);
+        }
 
         for (int i = 0; i < 10; i++){
-            if(strcmp(token, LIST[i]) ==0 ){
+            if(strcmp(token, LIST[i]) == 0){
                 ind = i;
+                any++;
             }
         }
 
         for(int i = 0; i < LIST_INDEX[ind]; i++ ){
             token = strtok(NULL, DELIM);
             if(token != NULL)
-                counter ++;
+                counter1 ++;
         }
+    
+        if(counter1 < LIST_INDEX[ind] || strtok(NULL, DELIM) != NULL){ //Limite   inferior / superior
 
-        if(counter < LIST_INDEX[ind]){
-             printf(WRONG_COMMAND, LIST[ind]);
+             if(any == 0)
+                printf(WRONG_COMMAND, strtok(command, DELIM));
+             else
+                printf(WRONG_COMMAND, LIST[ind]);
+             
              return 0;
+
         }else{
             /*Send to backend the command*/
+            printf("Send to backend\n");
             return 1;
         }
         
