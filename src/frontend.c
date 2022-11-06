@@ -57,7 +57,7 @@ int setup_command(char *command){
              exit(1);
         }
 
-        for (int i = 0; i < 10; i++){
+        for (int i = 0; i < strlen((char *)&LIST); i++){
             if(strcmp(token, LIST[i]) == 0){
                 ind = i;
                 any++;

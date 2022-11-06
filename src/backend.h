@@ -2,9 +2,17 @@
 #define BACKEND_H
 
 #include <stdbool.h>
-#define ROOTNAME "admin";
 #define VALID 1
+#define MSG_TAM 50
 
+//Error logs
+#define WRONG_COMMAND "COMMAND (%s) IS NOT CORRECT!\n"
+
+
+//Global Commands defualts
+char *LIST[] = {"users", "list", "kick", "prom", "reprom", "cancel", "close"};
+int LIST_INDEX[] = {0, 0, 1, 0, 0, 1, 0};
+char DELIM[] = {" "};
 
 /*Setup all data structs*/
 typedef struct client{
@@ -29,6 +37,6 @@ typedef struct items{
     //items *pnext;
 }items;
 
-
+int setup_command(char *command);
 
 #endif
