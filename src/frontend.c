@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
     while(VALID){
 
         int result_command;
-        printf("cmd > : ");
+        printf("<CLIENT:%s> : ",login.username);
         scanf("%[^\n]", command);
         
         result_command = setup_command(command);
