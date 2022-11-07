@@ -8,7 +8,7 @@
 
 //Error logs
 #define WRONG_COMMAND "COMMAND (%s) IS NOT CORRECT!\n"
-#define WRONG_SINTAXE "COMMAND (%s) SINTAXE ERROR!\n"
+#define WRONG_SINTAXE "COMMAND SINTAXE ERROR!\n"
 
 //Global Commands defualts
 char *LIST[] = {"users", "list", "kick", "prom", "reprom", "cancel", "close"};
@@ -21,7 +21,7 @@ typedef struct client{
     char *name;
     int password;
     int *id_own_items;
-    int money;
+    int balance;
     bool connection;
     //client *pnext;
 }client;

@@ -6,9 +6,20 @@
 #include <stdlib.h>
 #include "backend.h"
 
-int main(){
+extern char **environ;
 
-    char command[MSG_TAM];
+int main(int argc, char *argv[], char **envp){
+
+   char command[MSG_TAM];
+
+
+   char *promoFIleName = getenv("FPROMOTERS");
+   char *usersFIleName = getenv("FUSERS");
+   char *itemsFIleName = getenv("FITEMS");
+
+    if(promoFIleName)
+        printf("FPROMOTERS=%s\n",promoFIleName);
+    
 
     while(VALID){
 
@@ -16,7 +27,9 @@ int main(){
         printf("<ADMIN> -> ");
         scanf("%[^\n]", command);
         
-        result_command = setup_command(command);
+        if(setup_command(command) == 0)
+            printf(WRONG_SINTAXE);
+        
 
         setbuf(stdin,NULL);
     }
@@ -30,6 +43,7 @@ int setup_command(char *command){
         int any = 0;
         int counter1 = 0;
         int helper[15];
+        
         token = strtok(command, SPACE);
         
         if(strcmp(token,LIST[NUMBER_OF_COMMANDS-1]) == 0){
