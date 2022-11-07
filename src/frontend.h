@@ -14,11 +14,13 @@
 #define KICK_LOG "YOU HAVE BEEN KICKED FROM YOUR SESSION!\n";
 #define WRONG_INPUT "ENTER THE CORRECT INPUT (file name password)!\n"
 #define WRONG_COMMAND "COMMAND (%s) IS NOT CORRECT!\n"
+#define WRONG_VALUES "COMMAND (%s) VALUE ERROR!\n"
 
 //Global Commands defualts
 char *LIST[]= {"sell", "list", "licat", "lisel", "lival", "litime", "time", "buy", "cash", "add", "exit"};
 int LIST_INDEX[] = {5, 0, 1, 1, 1, 1, 0, 2, 0, 1, 0};
-char DELIM[] = {" "};
+char SPACE[] = {" "};
+int WRONG = 0;
 
 /*Setup all data structs*/
 typedef struct user{
