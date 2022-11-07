@@ -33,16 +33,16 @@ int setup_command(char *command){
 
         token = strtok(command, DELIM);
         
-        if(strcmp(token,"close") == 0){
+        if(strcmp(token,LIST[NUMBER_OF_COMMANDS-1]) == 0){
              sleep(1);
              printf("Closing everything...\n");
              exit(1);
         }
 
-        for (int i = 0; i < strlen((char *)&LIST); i++){
+        for (int i = 0; i < NUMBER_OF_COMMANDS; i++){
             if(strcmp(token, LIST[i]) == 0){
                 ind = i;
-                any++;   //Verify if command even existes
+                //any++;   //Verify if command even existes
             }
         }
 
@@ -54,7 +54,7 @@ int setup_command(char *command){
     
         if(counter1 < LIST_INDEX[ind] || strtok(NULL, DELIM) != NULL){ //Limite   inferior / superior
 
-             if(any == 0)
+             if(ind == -1)
                 printf(WRONG_COMMAND, strtok(command, DELIM));
              else
                 printf(WRONG_COMMAND, LIST[ind]);

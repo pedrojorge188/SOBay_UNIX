@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #define VALID 1
 #define MSG_TAM 50
+#define NUMBER_OF_COMMANDS 7
 
 //Error logs
 #define WRONG_COMMAND "COMMAND (%s) IS NOT CORRECT!\n"

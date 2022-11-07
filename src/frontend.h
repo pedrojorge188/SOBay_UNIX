@@ -1,7 +1,10 @@
 #ifndef FRONTEND_H
 #define FRONTEND_H
 
+
+
 #define VALID 1
+#define NUMBER_OF_COMMANDS 11
 
 #define HEARTBEAT_TIMER 20;
 #define MSG_TAM 50
@@ -13,9 +16,8 @@
 #define WRONG_COMMAND "COMMAND (%s) IS NOT CORRECT!\n"
 
 //Global Commands defualts
-
-char *LIST[] = {"sell", "list", "licat", "lisel", "lival", "litime", "time" , "buy", "add","exit"};
-int LIST_INDEX[] = {5, 0, 1, 1, 1, 1, 0, 3 ,1 ,0};
+char *LIST[]= {"sell", "list", "licat", "lisel", "lival", "litime", "time", "buy", "cash", "add", "exit"};
+int LIST_INDEX[] = {5, 0, 1, 1, 1, 1, 0, 2, 0, 1, 0};
 char DELIM[] = {" "};
 
 /*Setup all data structs*/

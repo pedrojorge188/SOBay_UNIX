@@ -11,6 +11,7 @@ int main(int argc, char **argv) {
 
     tryLogin login;
     char command[MSG_TAM];
+    
 
     //setup input verification
 
@@ -30,7 +31,7 @@ int main(int argc, char **argv) {
     while(VALID){
 
         int result_command;
-        printf("<CLIENT:%s> : ",login.username);
+        printf("<CLIENT: %s> : ",login.username);
         scanf("%[^\n]", command);
         
         result_command = setup_command(command);
@@ -51,18 +52,19 @@ int setup_command(char *command){
 
         token = strtok(command, DELIM);
         
-        if(strcmp(token,"exit") == 0){
+        if(strcmp(token,LIST[NUMBER_OF_COMMANDS-1]) == 0){
              sleep(1);
-             printf("Closing ...\n");
+             printf("Closing everything...\n");
              exit(1);
         }
 
-        for (int i = 0; i < strlen((char *)&LIST); i++){
+        for (int i = 0; i < NUMBER_OF_COMMANDS; i++){
             if(strcmp(token, LIST[i]) == 0){
                 ind = i;
-                any++;
+                //any++;   //Verify if command even existes
             }
         }
+
 
         for(int i = 0; i < LIST_INDEX[ind]; i++ ){
             token = strtok(NULL, DELIM);
@@ -72,7 +74,7 @@ int setup_command(char *command){
     
         if(counter1 < LIST_INDEX[ind] || strtok(NULL, DELIM) != NULL){ //Limite   inferior / superior
 
-             if(any == 0)
+             if(ind == -1)
                 printf(WRONG_COMMAND, strtok(command, DELIM));
              else
                 printf(WRONG_COMMAND, LIST[ind]);
@@ -81,7 +83,7 @@ int setup_command(char *command){
 
         }else{
             /*Send to backend the command*/
-            printf("Send to backend\n");
+            printf("Executing command...\n");
             return 1;
         }
         
