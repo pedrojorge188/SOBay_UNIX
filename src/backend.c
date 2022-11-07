@@ -29,9 +29,8 @@ int setup_command(char *command){
         int ind = -1;
         int any = 0;
         int counter1 = 0;
-        int counter2 = 0;
-
-        token = strtok(command, DELIM);
+        int helper[15];
+        token = strtok(command, SPACE);
         
         if(strcmp(token,LIST[NUMBER_OF_COMMANDS-1]) == 0){
              sleep(1);
@@ -42,31 +41,23 @@ int setup_command(char *command){
         for (int i = 0; i < NUMBER_OF_COMMANDS; i++){
             if(strcmp(token, LIST[i]) == 0){
                 ind = i;
-                //any++;   //Verify if command even existes
             }
         }
 
         for(int i = 0; i < LIST_INDEX[ind]; i++ ){
-            token = strtok(NULL, DELIM);
+            token = strtok(NULL, SPACE);
             if(token != NULL)
                 counter1 ++;
         }
-    
-        if(counter1 < LIST_INDEX[ind] || strtok(NULL, DELIM) != NULL){ //Limite   inferior / superior
 
-             if(ind == -1)
-                printf(WRONG_COMMAND, strtok(command, DELIM));
-             else
-                printf(WRONG_COMMAND, LIST[ind]);
-             
-             return 0;
+        if(counter1 < LIST_INDEX[ind] || strtok(NULL, SPACE) != NULL || ind == -1){ 
+
+            printf(WRONG_COMMAND, strtok(command,SPACE));
+            return 0;
 
         }else{
-            /*Send to backend the command*/
             printf("Executing command...\n");
             return 1;
-        }
-        
-                   
+        }                
 }
 

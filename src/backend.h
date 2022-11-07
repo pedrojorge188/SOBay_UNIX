@@ -8,12 +8,12 @@
 
 //Error logs
 #define WRONG_COMMAND "COMMAND (%s) IS NOT CORRECT!\n"
-
+#define WRONG_SINTAXE "COMMAND (%s) SINTAXE ERROR!\n"
 
 //Global Commands defualts
 char *LIST[] = {"users", "list", "kick", "prom", "reprom", "cancel", "close"};
 int LIST_INDEX[] = {0, 0, 1, 0, 0, 1, 0};
-char DELIM[] = {" "};
+char SPACE[] = {" "};
 
 /*Setup all data structs*/
 typedef struct client{
