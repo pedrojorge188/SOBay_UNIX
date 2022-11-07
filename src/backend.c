@@ -1,9 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <signal.h>
-#include <unistd.h>
-#include <stdlib.h>
 #include "backend.h"
 
 extern char **environ;
@@ -11,15 +5,11 @@ extern char **environ;
 int main(int argc, char *argv[], char **envp){
 
    char command[MSG_TAM];
-
-
-   char *promoFIleName = getenv("FPROMOTERS");
-   char *usersFIleName = getenv("FUSERS");
-   char *itemsFIleName = getenv("FITEMS");
-
-    if(promoFIleName)
-        printf("FPROMOTERS=%s\n",promoFIleName);
-    
+   char *usersFileName = getenv("FUSERS");
+   char *itemsFileName = getenv("FITEMS");
+   
+   // Verificão de funcionalidades da meta 1
+   printf("Meta 1 -> Deseja testar que funcionalidade? (startProm,startUsers,execItems)\n");
 
     while(VALID){
 
@@ -27,13 +17,43 @@ int main(int argc, char *argv[], char **envp){
         printf("<ADMIN> -> ");
         scanf("%[^\n]", command);
         
-        if(setup_command(command) == 0)
+        //verificação para a meta 1:
+        if(strcmp(command,"startProm") == 0)
+            run_promoter(1);
+        else{
+            if(setup_command(command) == 0)
             printf(WRONG_SINTAXE);
+        }    
         
-
         setbuf(stdin,NULL);
     }
     return 0;
+}
+
+int run_promoter(int promID){
+
+   char *promoFileName = getenv("FPROMOTERS");
+
+   int fprom;
+   char promoBuffer[70];
+
+   fprom = open(promoFileName,O_RDONLY);
+
+   if(fprom == -1){
+      printf(FILE_ERROR);
+      exit(ERROR_QUIT);
+   }
+
+   read(fprom,promoBuffer,6);
+
+   promoBuffer[69] = '\0';
+
+   printf("Executing Promoter:%s\n",promoBuffer);
+
+   execl(promoBuffer,promoBuffer,NULL);
+
+   close(fprom);
+
 }
 
 int setup_command(char *command){
@@ -49,7 +69,7 @@ int setup_command(char *command){
         if(strcmp(token,LIST[NUMBER_OF_COMMANDS-1]) == 0){
              sleep(1);
              printf("Closing everything...\n");
-             exit(1);
+             exit(ERROR_QUIT);
         }
 
         for (int i = 0; i < NUMBER_OF_COMMANDS; i++){

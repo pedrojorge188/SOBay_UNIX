@@ -1,6 +1,12 @@
 #ifndef FRONTEND_H
 #define FRONTEND_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <signal.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 
 #define VALID 1

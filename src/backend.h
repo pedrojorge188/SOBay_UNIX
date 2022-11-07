@@ -2,6 +2,15 @@
 #define BACKEND_H
 
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <signal.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <fcntl.h>
+
 #define VALID 1
 #define MSG_TAM 50
 #define NUMBER_OF_COMMANDS 7
@@ -9,6 +18,8 @@
 //Error logs
 #define WRONG_COMMAND "COMMAND (%s) IS NOT CORRECT!\n"
 #define WRONG_SINTAXE "COMMAND SINTAXE ERROR!\n"
+#define FILE_ERROR "ERROR ON FILE OPENING!\n"
+#define ERROR_QUIT 0
 
 //Global Commands defualts
 char *LIST[] = {"users", "list", "kick", "prom", "reprom", "cancel", "close"};
@@ -39,5 +50,5 @@ typedef struct items{
 }items;
 
 int setup_command(char *command);
-
+int run_promoter(int promID);
 #endif
