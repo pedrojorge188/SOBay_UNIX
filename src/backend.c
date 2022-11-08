@@ -34,8 +34,9 @@ int run_promoter(int promID){
 
    char *promoFileName = getenv("FPROMOTERS");
 
-   int fprom;
-   char promoBuffer[70];
+   int fprom,size;
+   int res,req;
+   char promoBuffer[250];
 
    fprom = open(promoFileName,O_RDONLY);
 
@@ -44,16 +45,16 @@ int run_promoter(int promID){
       exit(ERROR_QUIT);
    }
 
-   read(fprom,promoBuffer,6);
+   size = read(fprom,promoBuffer,20);
 
-   promoBuffer[69] = '\0';
+   promoBuffer[size] = '\0';
 
    printf("Executing Promoter:%s\n",promoBuffer);
 
-   execl(promoBuffer,promoBuffer,NULL);
+   req = execl(promoBuffer,promoBuffer,NULL);
+   printf("%d",req);
 
    close(fprom);
-
 }
 
 int setup_command(char *command){
