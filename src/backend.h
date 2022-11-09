@@ -20,11 +20,13 @@
 #define WRONG_SINTAXE "COMMAND SINTAXE ERROR!\n"
 #define FILE_ERROR "ERROR ON FILE OPENING!\n"
 #define ERROR_QUIT 0
+#define WRONG_VALUES "COMMAND (%s) VALUE ERROR!\n"
 
 //Global Commands defualts
 char *LIST[] = {"users", "list", "kick", "prom", "reprom", "cancel", "close"};
 int LIST_INDEX[] = {0, 0, 1, 0, 0, 1, 0};
 char SPACE[] = {" "};
+int WRONG = 0;
 
 /*Setup all data structs*/
 typedef struct client{

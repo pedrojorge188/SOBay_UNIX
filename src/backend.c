@@ -21,8 +21,8 @@ int main(int argc, char *argv[], char **envp){
         if(strcmp(command,"startProm") == 0)
             run_promoter(1);
         else{
-            if(setup_command(command) == 0)
-            printf(WRONG_SINTAXE);
+            setup_command(command);
+            WRONG = 0;
         }    
         
         setbuf(stdin,NULL);
@@ -57,42 +57,68 @@ int run_promoter(int promID){
    close(fprom);
 }
 
+
 int setup_command(char *command){
-        
-        char *token;
-        int ind = -1;
-        int any = 0;
-        int counter1 = 0;
-        int helper[15];
-        
-        token = strtok(command, SPACE);
-        
-        if(strcmp(token,LIST[NUMBER_OF_COMMANDS-1]) == 0){
-             sleep(1);
-             printf("Closing everything...\n");
-             exit(ERROR_QUIT);
-        }
+    
+    char *token, sub[10];
+    int ind = -1;
+    int any = 0;
+    int counter = 0;
 
-        for (int i = 0; i < NUMBER_OF_COMMANDS; i++){
-            if(strcmp(token, LIST[i]) == 0){
-                ind = i;
-            }
-        }
+    token = strtok(command, SPACE);
 
-        for(int i = 0; i < LIST_INDEX[ind]; i++ ){
+    if(strcmp(token, LIST[NUMBER_OF_COMMANDS-1]) == 0){
+            sleep(1);
+            printf("Closing everything...\n");
+            exit(1);
+    }
+
+    for (int i = 0; i < NUMBER_OF_COMMANDS; i++){
+        if(strcmp(token, LIST[i]) == 0){
+            ind = i;
+        }
+    }
+
+   switch(ind){
+        case 2:
             token = strtok(NULL, SPACE);
-            if(token != NULL)
-                counter1 ++;
-        }
+            if (token == NULL)
+                break;
+            strcpy(sub, token);
+            if(atoi(sub)!=0) {
+                WRONG++;
+                break;
+            }
+            counter++;
+            break;
 
-        if(counter1 < LIST_INDEX[ind] || strtok(NULL, SPACE) != NULL || ind == -1){ 
+        case 5:
+            token = strtok(NULL, SPACE);
+            if (token == NULL)
+                break;
+            strcpy(sub, token);
+            if(atoi(sub)!=0) {
+                WRONG++;
+                break;
+            }
+            counter++;
+            break;
 
-            printf(WRONG_COMMAND, strtok(command,SPACE));
+        default:
+        //Nothing to be Verified
+    }
+
+    if(counter < LIST_INDEX[ind] || strtok(NULL, SPACE) != NULL || ind == -1 || WRONG == 1){ //Limite   inferior / superior
+
+            if(WRONG > 0)
+                printf(WRONG_VALUES, strtok(command, SPACE));
+            else
+                printf(WRONG_COMMAND, strtok(command, SPACE));
             return 0;
+    }else{
+        //end to backend the command
+        printf("Executing command...\n");
+        return 1;
+    }
 
-        }else{
-            printf("Executing command...\n");
-            return 1;
-        }                
 }
-
