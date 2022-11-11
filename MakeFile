@@ -12,6 +12,9 @@ frontend: ${path}/frontend.c ${path}/frontend.h
 	${cc} ${path}/frontend.c  -o frontend
 	@echo "Successful complilation of frontend!"
 
+AmbVar: 
+	export FPROMOTERS=promo.txt
+
 clean:
 	rm backend frontend 
 	@echo "Files deleted Successfully!"

@@ -1,1 +1,2 @@
-./frontend 0 0
+gcc -o teste testePromo.c
+./teste

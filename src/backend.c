@@ -7,7 +7,6 @@ int main(int argc, char *argv[], char **envp){
    char command[MSG_TAM];
    char *usersFileName = getenv("FUSERS");
    char *itemsFileName = getenv("FITEMS");
-   
    // Verificão de funcionalidades da meta 1
    printf("Meta 1 -> Deseja testar que funcionalidade? (startProm,startUsers,execItems)\n");
 
@@ -33,9 +32,10 @@ int main(int argc, char *argv[], char **envp){
 int run_promoter(int promID){
 
    char *promoFileName = getenv("FPROMOTERS");
+   char *boas;
+   
 
    int fprom,size;
-   int res,req;
    char promoBuffer[250];
 
    fprom = open(promoFileName,O_RDONLY);
@@ -45,14 +45,14 @@ int run_promoter(int promID){
       exit(ERROR_QUIT);
    }
 
-   size = read(fprom,promoBuffer,20);
+   while(size = read(fprom,promoBuffer,sizeof(promoBuffer)) && promoBuffer[i]){
+        
+   }
 
-   promoBuffer[size] = '\0';
 
    printf("Executing Promoter:%s\n",promoBuffer);
 
-   req = execl(promoBuffer,promoBuffer,NULL);
-   printf("%d",req);
+   execlp(promoBuffer,promoBuffer,NULL);
 
    close(fprom);
 }
