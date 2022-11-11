@@ -6,7 +6,6 @@ int main(int argc, char **argv) {
     tryLogin login;
     char command[MSG_TAM];
     
-    //setup input verification
     if(argc < 3){
          printf(WRONG_INPUT);
          exit(1);

@@ -22,6 +22,7 @@
 #define ERROR_QUIT 0
 #define WRONG_VALUES "COMMAND (%s) VALUE ERROR!\n"
 
+
 //Global Commands defualts
 char *LIST[] = {"users", "list", "kick", "prom", "reprom", "cancel", "close"};
 int LIST_INDEX[] = {0, 0, 1, 0, 0, 1, 0};
@@ -36,7 +37,6 @@ typedef struct client{
     int *id_own_items;
     int balance;
     bool connection;
-    //client *pnext;
 }client;
 
 typedef struct items{
@@ -48,9 +48,15 @@ typedef struct items{
     int id_owner;
     bool sell_state;
     int time_left;
-    //items *pnext;
 }items;
 
+typedef struct promoter
+{
+    char *category;
+    int promotion;
+    int duration;
+}promoter;
+
 int setup_command(char *command);
-int run_promoter(int promID);
+int run_promoter(int promId);
 #endif

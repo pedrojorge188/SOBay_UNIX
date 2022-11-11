@@ -22,6 +22,7 @@
 #define WRONG_COMMAND "COMMAND (%s) IS NOT CORRECT!\n"
 #define WRONG_VALUES "COMMAND (%s) VALUE ERROR!\n"
 
+
 //Global Commands defualts
 char *LIST[]= {"sell", "list", "licat", "lisel", "lival", "litime", "time", "buy", "cash", "add", "exit"};
 int LIST_INDEX[] = {5, 0, 1, 1, 1, 1, 0, 2, 0, 1, 0};

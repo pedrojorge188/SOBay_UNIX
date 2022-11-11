@@ -7,6 +7,7 @@
         "signal.h": "c",
         "string.h": "c",
         "backend.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "fcntl.h": "c"
     }
 }
