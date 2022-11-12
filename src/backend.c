@@ -12,7 +12,10 @@ int main(int argc, char *argv[], char **envp)
     init_env_var();
 
     //Load dos items do ficheiro 
-    load_items((items *)&itemsList);
+    if(!load_items((items *)&itemsList))
+        printf(LOAD_ITEMS_ERROR);
+
+    list_items_to_sell((items *)&itemsList);
 
     // Verificão de funcionalidades da meta 1
     printf("Meta 1 -> Deseja testar que funcionalidade? (startProm,startUsers,execItems)\n");
@@ -24,11 +27,12 @@ int main(int argc, char *argv[], char **envp)
         printf("<ADMIN> -> ");
         scanf("%[^\n]", command);
 
-        // Primeira Meta Validação da entrafa
-        // Mais tarde esta funcionalidade ira desaparecer e os promotores serao executados automaticamente
         if (strcmp(command, "startProm") == 0)
+
             run_promoter(1);
+
         else if (setup_command(command) == 0)
+
             printf(WRONG_SINTAXE);
 
         setbuf(stdin, NULL);
@@ -36,14 +40,13 @@ int main(int argc, char *argv[], char **envp)
     return 0;
 }
 
-void load_items(items *itemsList){
-    
+int load_items(items *itemsList){
+
     char *itemsFileName = getenv("FITEMS");
-    int fItems,size,nItems;
-    int counter = 0;
-    char itemBuffer[500];
+    
+    int fItems,size;
+    char itemBuffer[BUFITEMS_SIZE];
     char *token;
-    char currentValue[50];
 
     fItems = open(itemsFileName, O_RDONLY);
 
@@ -52,15 +55,12 @@ void load_items(items *itemsList){
 
     size = read(fItems,itemBuffer, sizeof(itemBuffer));
     itemBuffer[size] = '\0';
+
     close(fItems);
-
-    
-
-    printf("%d\n",nItems);
 
     token = strtok(itemBuffer,SPACE);
 
-    for(int item=0;item<3;item++){
+    for(int item=0;item<NITEMS;item++){
         itemsList[item].id = atoi(token); // id
         token = strtok(NULL,SPACE);
         itemsList[item].name = token; // nome do item
@@ -80,7 +80,12 @@ void load_items(items *itemsList){
 
     }
 
-    for(int i=0;i<3;i++){
+    return 1;
+}
+
+void list_items_to_sell(items *itemsList){
+
+    for(int i=0;i<NITEMS;i++){
         printf("%d %s %s %d  %d  %d  %s %s \n",
         itemsList[i].id,
         itemsList[i].name,
@@ -92,6 +97,7 @@ void load_items(items *itemsList){
         itemsList[i].username_best_option);
     }
 }
+
 int run_promoter(int promId)
 {
 

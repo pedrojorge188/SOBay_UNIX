@@ -11,15 +11,18 @@
 #include <stdio.h>
 #include <fcntl.h>
 
+
 #define VALID 1
 #define MSG_TAM 50
 #define NUMBER_OF_COMMANDS 7
+#define BUFITEMS_SIZE 4000
 
 //Error logs
 #define WRONG_COMMAND "COMMAND (%s) IS NOT CORRECT!\n"
 #define WRONG_SINTAXE "COMMAND SINTAXE ERROR!\n"
 #define FILE_ERROR "ERROR ON FILE OPENING!\n"
 #define ERROR_QUIT 0
+#define LOAD_ITEMS_ERROR "ERROR ON ITEMS LOADING!\n"
 #define WRONG_VALUES "COMMAND (%s) VALUE ERROR!\n"
 #define MAX_ITEMS 30
 
@@ -28,6 +31,7 @@ char *LIST[] = {"users", "list", "kick", "prom", "reprom", "cancel", "close"};
 int LIST_INDEX[] = {0, 0, 1, 0, 0, 1, 0};
 char SPACE[] = {" "};
 int WRONG = 0;
+int NITEMS = 6;
 
 /*Setup all data structs*/
 typedef struct client{
@@ -61,5 +65,6 @@ typedef struct promoter
 int setup_command(char *command);
 int run_promoter(int promId);
 void init_env_var();
-void load_items(items *itemsList);
+void list_items_to_sell(items *itemsList);
+int load_items(items *itemsList);
 #endif
