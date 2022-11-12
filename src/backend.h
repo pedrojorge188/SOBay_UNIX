@@ -21,7 +21,7 @@
 #define FILE_ERROR "ERROR ON FILE OPENING!\n"
 #define ERROR_QUIT 0
 #define WRONG_VALUES "COMMAND (%s) VALUE ERROR!\n"
-
+#define MAX_ITEMS 30
 
 //Global Commands defualts
 char *LIST[] = {"users", "list", "kick", "prom", "reprom", "cancel", "close"};
@@ -43,9 +43,10 @@ typedef struct items{
     int id;
     char *name;
     char *category;
+    char *username_owner;
+    char *username_best_option;
     int buy_now_price;
-    int main_price;
-    int id_owner;
+    int current_price;
     bool sell_state;
     int time_left;
 }items;
@@ -59,4 +60,6 @@ typedef struct promoter
 
 int setup_command(char *command);
 int run_promoter(int promId);
+void init_env_var();
+void load_items(items *itemsList);
 #endif

@@ -8,6 +8,7 @@
         "string.h": "c",
         "backend.h": "c",
         "stdio.h": "c",
-        "fcntl.h": "c"
+        "fcntl.h": "c",
+        "typeinfo": "c"
     }
 }

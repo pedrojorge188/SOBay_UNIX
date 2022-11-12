@@ -1,0 +1,4 @@
+1 cocacola bebidas 10 15 20 pedro antonio
+2 tapete casa 12 18 10 rodrigo antonio
+3 quadro casa 40 70 11 pedro antonio
+
