@@ -15,7 +15,7 @@ int main(int argc, char *argv[], char **envp)
     if(!load_items((items *)&itemsList))
         printf(LOAD_ITEMS_ERROR);
 
-    list_items_to_sell((items *)&itemsList);
+   // list_items_to_sell((items *)&itemsList);
 
     // Verificão de funcionalidades da meta 1
     printf("Meta 1 -> Deseja testar que funcionalidade? (startProm,startUsers,execItems)\n");
