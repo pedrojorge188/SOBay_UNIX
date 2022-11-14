@@ -25,6 +25,8 @@
 #define LOAD_ITEMS_ERROR "ERROR ON ITEMS LOADING!\n"
 #define WRONG_VALUES "COMMAND (%s) VALUE ERROR!\n"
 #define MAX_ITEMS 30
+#define MAX_USERS 20
+#define MAX_PROMOS 10
 
 //Global Commands defualts
 char *LIST[] = {"users", "list", "kick", "prom", "reprom", "cancel", "close"};
