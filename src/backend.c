@@ -138,7 +138,6 @@ int run_promoter(char *promoterName)
 
     execPromo[counter - 1] = '\0';
 
-<<<<<<< Updated upstream
     printf("Executing Promoter(%s)\n", execPromo);
 
     execlp(execPromo, execPromo, NULL);
@@ -216,11 +215,6 @@ int run_users(){
     }while(opcao != 3);
     
     return 0;
-=======
-    printf("Executing promoter (%s)\n",execPromo);
-
-
->>>>>>> Stashed changes
 }
 
 int setup_command(char *command)
