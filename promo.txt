@@ -1,3 +1,2 @@
-./promotor_oficial
 ./black_friday
-
+./promotor_oficial

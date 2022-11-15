@@ -31,6 +31,7 @@ int main(int argc, char *argv[], char **envp)
             run_promoter(1);
 
         else if (strcmp(command, "startUsers") == 0){
+
             run_users();
         }
         else if (strcmp(command,"execItems") == 0)
@@ -137,8 +138,11 @@ int run_promoter(int promId)
     }
 
     execPromo[counter - 1] = '\0';
-    printf("Executing Promoter:\t%s\n", execPromo);
+
+    printf("Executing Promoter(%s)\n", execPromo);
+
     execlp(execPromo, execPromo, NULL);
+    
 }
 
 int run_users(){
