@@ -6,6 +6,7 @@ int main(int argc, char *argv[], char **envp)
 {
     char command[MSG_TAM];
     items itemsList[MAX_ITEMS];
+    promoter promoter;
 
     //Guarda o nome dos ficheiros nas variaveis de ambiente
     init_env_var();
@@ -14,7 +15,6 @@ int main(int argc, char *argv[], char **envp)
     if(!load_items((items *)&itemsList))
         printf(LOAD_ITEMS_ERROR);
 
-   // list_items_to_sell((items *)&itemsList);
 
     // Verificão de funcionalidades da meta 1
     printf("Meta 1 -> Deseja testar que funcionalidade? (startProm,startUsers,execItems)\n");
@@ -33,6 +33,10 @@ int main(int argc, char *argv[], char **envp)
         else if (strcmp(command, "startUsers") == 0){
             run_users();
         }
+        else if (strcmp(command,"execItems") == 0)
+
+             list_items_to_sell((items *)&itemsList);
+
         else if (setup_command(command) == 0)
 
             printf(WRONG_SINTAXE);
@@ -98,6 +102,7 @@ void list_items_to_sell(items *itemsList){
         itemsList[i].username_owner,
         itemsList[i].username_best_option);
     }
+    
 }
 
 int run_promoter(int promId)
