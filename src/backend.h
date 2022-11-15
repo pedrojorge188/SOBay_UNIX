@@ -7,6 +7,7 @@
 #include <string.h>
 #include <signal.h>
 #include <unistd.h>
+#include <sys/wait.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -16,7 +17,8 @@
 #define VALID 1
 #define MSG_TAM 50
 #define NUMBER_OF_COMMANDS 7
-#define BUFITEMS_SIZE 4000
+#define BUF_SIZE 4000
+#define NUM_PROMO 2
 
 //Error logs
 #define WRONG_COMMAND "COMMAND (%s) IS NOT CORRECT!\n"
@@ -35,6 +37,7 @@ char *LIST[] = {"users", "list", "kick", "prom", "reprom", "cancel", "close"};
 int LIST_INDEX[] = {0, 0, 1, 0, 0, 1, 0};
 char SPACE[] = {" "};
 int WRONG = 0;
+
 int NITEMS = 6;
 
 /*Setup all data structs*/
@@ -66,7 +69,7 @@ typedef struct promoter{
 }promoter;
 
 int setup_command(char *command);
-int run_promoter(int promId);
+int run_promoter(char *promoterName);
 void init_env_var();
 void list_items_to_sell(items *itemsList);
 int load_items(items *itemsList);

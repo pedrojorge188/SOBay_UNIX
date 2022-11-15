@@ -6,10 +6,11 @@ int main(int argc, char *argv[], char **envp)
 {
     char command[MSG_TAM];
     items itemsList[MAX_ITEMS];
-    promoter promoter;
 
     //Guarda o nome dos ficheiros nas variaveis de ambiente
     init_env_var();
+
+    setbuf(stdout,NULL);
 
     //Load dos items do ficheiro 
     if(!load_items((items *)&itemsList))
@@ -28,7 +29,7 @@ int main(int argc, char *argv[], char **envp)
 
         if (strcmp(command, "startProm") == 0)
 
-            run_promoter(1);
+            run_promoter("./black_friday");
 
         else if (strcmp(command, "startUsers") == 0){
 
@@ -44,6 +45,7 @@ int main(int argc, char *argv[], char **envp)
 
         setbuf(stdin, NULL);
     }
+
     return 0;
 }
 
@@ -52,7 +54,7 @@ int load_items(items *itemsList){
     char *itemsFileName = getenv("FITEMS");
     
     int fItems,size;
-    char itemBuffer[BUFITEMS_SIZE];
+    char itemBuffer[BUF_SIZE];
     char *token;
 
     fItems = open(itemsFileName, O_RDONLY);
@@ -103,42 +105,40 @@ void list_items_to_sell(items *itemsList){
         itemsList[i].username_owner,
         itemsList[i].username_best_option);
     }
-    
+
 }
 
-int run_promoter(int promId)
+int run_promoter(char *promoterName)
 {
 
     char *promoFileName = getenv("FPROMOTERS");
-
-    int fprom, size, resp;
+    int fprom, size, value;
     int counter = 0;
-    char promoBuffer[250];
-    char execPromo[80];
-    char stdout_mensage[80];
-
+    char promoBuffer[300];
+    char *execPromo;
     promoter this_promoter;
 
     /*First Reading of promnoter*/
     fprom = open(promoFileName, O_RDONLY);
+
     if (fprom == -1)
     {
         printf(FILE_ERROR);
     }
 
-    size = read(fprom, promoBuffer, sizeof(promoBuffer));
+    size = read(fprom,promoBuffer, sizeof(promoBuffer));
     promoBuffer[size] = '\0';
 
     close(fprom);
 
-    while (promoBuffer[counter] != '\n')
-    {
+    while(promoBuffer[counter] != '\n'){
         execPromo[counter] = promoBuffer[counter];
         counter++;
     }
 
     execPromo[counter - 1] = '\0';
 
+<<<<<<< Updated upstream
     printf("Executing Promoter(%s)\n", execPromo);
 
     execlp(execPromo, execPromo, NULL);
@@ -216,6 +216,11 @@ int run_users(){
     }while(opcao != 3);
     
     return 0;
+=======
+    printf("Executing promoter (%s)\n",execPromo);
+
+
+>>>>>>> Stashed changes
 }
 
 int setup_command(char *command)
