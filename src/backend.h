@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 
+#include "users_lib.h"
 
 #define VALID 1
 #define MSG_TAM 50
@@ -25,6 +26,7 @@
 #define LOAD_ITEMS_ERROR "ERROR ON ITEMS LOADING!\n"
 #define WRONG_VALUES "COMMAND (%s) VALUE ERROR!\n"
 #define MAX_ITEMS 30
+
 
 //Global Commands defualts
 char *LIST[] = {"users", "list", "kick", "prom", "reprom", "cancel", "close"};
@@ -55,8 +57,7 @@ typedef struct items{
     int time_left;
 }items;
 
-typedef struct promoter
-{
+typedef struct promoter{
     char *category;
     int promotion;
     int duration;
@@ -67,4 +68,5 @@ int run_promoter(int promId);
 void init_env_var();
 void list_items_to_sell(items *itemsList);
 int load_items(items *itemsList);
+int run_users();
 #endif
