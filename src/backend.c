@@ -35,6 +35,7 @@ int main(int argc, char *argv[], char **envp)
 
             run_users();
         }
+        
         else if (strcmp(command,"execItems") == 0)
 
              list_items_to_sell((items *)&itemsList);
