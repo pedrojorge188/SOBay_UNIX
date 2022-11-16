@@ -12,7 +12,9 @@
 
 #include "users_lib.h"
 
-#define VALID 1
+#define FOREVER 1
+#define RD 0
+#define WR 1
 #define MSG_TAM 50
 #define NUMBER_OF_COMMANDS 7
 #define BUF_SIZE 4000
@@ -25,11 +27,13 @@
 #define ERROR_QUIT 0
 #define LOAD_ITEMS_ERROR "ERROR ON ITEMS LOADING!\n"
 #define WRONG_VALUES "COMMAND (%s) VALUE ERROR!\n"
+
+//Const's files
 #define MAX_ITEMS 30
 #define MAX_USERS 20
 #define MAX_PROMOS 10
-#define NITEMS 6
 #define NUSERS 10
+#define NPROMOTERS 10
 
 
 
@@ -39,7 +43,12 @@ int LIST_INDEX[] = {0, 0, 1, 0, 0, 1, 0};
 char SPACE[] = {" "};
 int WRONG = 0;
 
+//Increment Globals
+int NITEMS = 6;
+
+/*Reading Defauls*/
 char *nameUsers[NUSERS];
+char *namePromoters[NUSERS];
 
 /*Setup all data structs*/
 typedef struct client{

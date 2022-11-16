@@ -8,26 +8,26 @@ int main(int argc, char *argv[], char **envp)
     items itemsList[MAX_ITEMS];
 
 
-    //Guarda o nome dos ficheiros nas variaveis de ambiente
     init_env_var();
 
     setbuf(stdout,NULL);
 
-    //Load dos items do ficheiro 
+    
     if(!load_items(itemsList))
         printf(LOAD_ITEMS_ERROR);
 
 
-    // Verificão de funcionalidades da meta 1
     printf("Meta 1 -> Deseja testar que funcionalidade? (startProm,startUsers,execItems)\n");
 
-    while (VALID)
+    while (FOREVER)
     {
 
         int result_command;
+        
         printf("<ADMIN> -> ");
-        //scanf("%[^\n]", command);
+
         fgets(command,MSG_TAM-1,stdin);
+
         command[strlen(command)-1] = '\0';
 
         if (strcmp(command, "startProm") == 0)
@@ -111,40 +111,75 @@ void list_items_to_sell(items *itemsList){
     }
 
 }
+int getPromoters(){
+    char *promoFileName = getenv("FPROMOTERS");
+    
+    int fpromo,size;
+    char promoBuffer[BUF_SIZE];
+    char *token;
+
+    fpromo = open(promoFileName, O_RDONLY);
+
+    if (fpromo == -1)
+        printf(FILE_ERROR);
+
+    size = read(fpromo,promoBuffer, sizeof(promoBuffer));
+    promoBuffer[size] = '\0';
+
+    close(fpromo);
+
+    token = strtok(promoBuffer,"\n");
+
+    for(int i=0; i<NPROMOTERS; i++){
+
+        namePromoters[i] = token; 
+
+        token = strtok(NULL,"\n"); 
+    }
+
+    return 1;
+}
 
 int run_promoter(char *promoterName)
 {
+    char *promoter1;
+    char mensage_promoter[20];
 
-    char *promoFileName = getenv("FPROMOTERS");
-    int fprom, size, value;
-    int counter = 0;
-    char promoBuffer[300];
-    char *execPromo;
-    promoter this_promoter;
+    //getPromoters(); // Na meta 2 vamos usar para ler o ficheiro promoters
 
-    /*First Reading of promnoter*/
-    fprom = open(promoFileName, O_RDONLY);
+    promoter1 = "./black_friday";
 
-    if (fprom == -1)
-    {
-        printf(FILE_ERROR);
+    int tube[2];
+    
+    pipe(tube);
+
+    if(fork() == 0){
+        
+        close(1);
+        dup(tube[WR]);
+        close(tube[WR]);
+        close(tube[RD]);
+        
+        execlp(promoter1,promoter1,NULL);
+        
+    }else{
+
+        close(tube[WR]);
+
+        while(1){
+
+            if(read(tube[RD],mensage_promoter,sizeof(mensage_promoter)) >= 0){
+
+                for(int i=0;i<strlen(mensage_promoter)-1;i++)
+                    printf("%c",mensage_promoter[i]);
+
+                printf("->PROMOTER RECIVED!\n");
+            }
+
+        }
+        
+        close(tube[RD]);
     }
-
-    size = read(fprom,promoBuffer, sizeof(promoBuffer));
-    promoBuffer[size] = '\0';
-
-    close(fprom);
-
-    while(promoBuffer[counter] != '\n'){
-        execPromo[counter] = promoBuffer[counter];
-        counter++;
-    }
-
-    execPromo[counter - 1] = '\0';
-
-    printf("Executing Promoter(%s)\n", execPromo);
-
-    execlp(execPromo, execPromo, NULL);
     
 }
 
