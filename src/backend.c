@@ -13,7 +13,7 @@ int main(int argc, char *argv[], char **envp)
     setbuf(stdout,NULL);
 
     //Load dos items do ficheiro 
-    if(!load_items((items *)&itemsList))
+    if(!load_items(itemsList))
         printf(LOAD_ITEMS_ERROR);
 
 
@@ -25,7 +25,9 @@ int main(int argc, char *argv[], char **envp)
 
         int result_command;
         printf("<ADMIN> -> ");
-        scanf("%[^\n]", command);
+        //scanf("%[^\n]", command);
+        fgets(command,MSG_TAM-1,stdin);
+        command[strlen(command)-1] = '\0';
 
         if (strcmp(command, "startProm") == 0)
 
@@ -223,9 +225,9 @@ int run_users(){
                 scanf("%s %d", user, &sal);
 
                 resultado=updateUserBalance(user, sal);
-                if(resultado == -1){
+                if(resultado == 0){
                     printf("%s\n", getLastErrorText());
-                }else if(resultado == 0){
+                }else if(resultado == -1){
                     printf("Saldo atualizado com sucesso\n");
                 }
                 break;
@@ -247,8 +249,6 @@ int run_users(){
         {
             updateUserBalance(nameUsers[i], getUserBalance(nameUsers[i])-1);
         }
-        
-        
 
     }while(opcao != 3);
     
