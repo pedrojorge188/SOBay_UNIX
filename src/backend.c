@@ -145,11 +145,40 @@ int run_promoter(char *promoterName)
     
 }
 
+int getUsers(){
+    char *usersFileName = getenv("FUSERS");
+    
+    int fUsers,size;
+    char UserBuffer[BUF_SIZE];
+    char *token;
+
+    fUsers = open(usersFileName, O_RDONLY);
+
+    if (fUsers == -1)
+        printf(FILE_ERROR);
+
+    size = read(fUsers,UserBuffer, sizeof(UserBuffer));
+    UserBuffer[size] = '\0';
+
+    close(fUsers);
+
+    token = strtok(UserBuffer,SPACE);
+
+    for(int i=0; i<NUSERS; i++){
+        nameUsers[i] = token; // store Users name
+        token = strtok(NULL,"\n"); //Get to the end of line
+        token = strtok(NULL,SPACE); //Get users name
+    }
+    return 0;
+}
+
 int run_users(){
     int opcao = -1, resultado, sal;
     char *user, *pass;
 
     char *userFileName = getenv("FUSERS");
+
+    getUsers();
 
     if(loadUsersFile(userFileName) == -1){
         printf("%s\n", getLastErrorText());
@@ -213,6 +242,14 @@ int run_users(){
             default:
                 break;
         }
+
+        for (int i = 0; i < NUSERS; i++)
+        {
+            updateUserBalance(nameUsers[i], getUserBalance(nameUsers[i])-1);
+        }
+        
+        
+
     }while(opcao != 3);
     
     return 0;

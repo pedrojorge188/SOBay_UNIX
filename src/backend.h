@@ -28,6 +28,9 @@
 #define MAX_ITEMS 30
 #define MAX_USERS 20
 #define MAX_PROMOS 10
+#define NITEMS 6
+#define NUSERS 10
+
 
 
 //Global Commands defualts
@@ -36,7 +39,7 @@ int LIST_INDEX[] = {0, 0, 1, 0, 0, 1, 0};
 char SPACE[] = {" "};
 int WRONG = 0;
 
-int NITEMS = 6;
+char *nameUsers[NUSERS];
 
 /*Setup all data structs*/
 typedef struct client{
@@ -72,4 +75,5 @@ void init_env_var();
 void list_items_to_sell(items *itemsList);
 int load_items(items *itemsList);
 int run_users();
+int getUsers();
 #endif
