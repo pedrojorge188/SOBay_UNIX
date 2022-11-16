@@ -7,6 +7,7 @@ int main(int argc, char *argv[], char **envp)
     char command[MSG_TAM];
     items itemsList[MAX_ITEMS];
 
+
     //Guarda o nome dos ficheiros nas variaveis de ambiente
     init_env_var();
 
