@@ -1,13 +1,12 @@
-Antonio pass 37
-Joao oieh -6
-Pedro karatekid 56
-Rodrigo cocacola 29
-Travassos icetea -13
-Tondela ogre 32
-Maria benfica 85
-Leonardo pano 99987
-Gaspar farinha -3
-Mateus python 22
+Antonio pass 31
+Joao oieh -12
+Pedro karatekid 50
+Rodrigo cocacola 23
+Travassos icetea -19
+Tondela ogre 26
+Maria benfica 79
+Leonardo pano 5999997
+Gaspar farinha -9
+Mateus python 16
 python 35 0
 thon 35 0
-
