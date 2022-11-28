@@ -43,8 +43,6 @@ int LIST_INDEX[] = {0, 0, 1, 0, 0, 1, 0};
 char SPACE[] = {" "};
 int WRONG = 0;
 
-//Increment Globals
-int NITEMS = 6;
 
 /*Reading Defauls*/
 char *nameUsers[NUSERS];

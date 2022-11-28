@@ -2,5 +2,3 @@
 2 tapete casa 12 18 10 rodrigo antonio
 3 quadro casa 40 70 11 pedro antonio
 4 quadro casa 40 70 11 pedro antonio
-5 quadro casa 40 70 11 pedro antonio
-6 quadro casa 40 70 11 pedro antonio

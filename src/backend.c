@@ -7,17 +7,10 @@ int main(int argc, char *argv[], char **envp)
     char command[MSG_TAM];
     items itemsList[MAX_ITEMS];
 
-
     init_env_var();
 
     setbuf(stdout,NULL);
 
-    
-    if(!load_items(itemsList))
-        printf(LOAD_ITEMS_ERROR);
-
-
-    printf("Meta 1 -> Deseja testar que funcionalidade? (startProm,startUsers,execItems)\n");
 
     while (FOREVER)
     {
@@ -40,8 +33,8 @@ int main(int argc, char *argv[], char **envp)
         }
         
         else if (strcmp(command,"execItems") == 0)
-
-             list_items_to_sell((items *)&itemsList);
+             
+             load_items((items *)&itemsList);
 
         else if (setup_command(command) == 0)
 
@@ -57,23 +50,24 @@ int load_items(items *itemsList){
 
     char *itemsFileName = getenv("FITEMS");
     
-    int fItems,size;
-    char itemBuffer[BUF_SIZE];
+    FILE   *fItems;
+    char itemBuffer[150];
+    int counter = 0;
     char *token;
 
-    fItems = open(itemsFileName, O_RDONLY);
+    fItems = fopen(itemsFileName,"r");
 
-    if (fItems == -1)
+    if (!fItems)
         printf(FILE_ERROR);
 
-    size = read(fItems,itemBuffer, sizeof(itemBuffer));
-    itemBuffer[size] = '\0';
+    char line[100];
 
-    close(fItems);
+    int item = 0;
 
-    token = strtok(itemBuffer,SPACE);
+    while(fgets(itemBuffer,sizeof(itemBuffer),fItems)){
 
-    for(int item=0;item<NITEMS;item++){
+        printf("-%s-",itemBuffer);
+        token = strtok(itemBuffer,SPACE);
         itemsList[item].id = atoi(token); // id
         token = strtok(NULL,SPACE);
         itemsList[item].name = token; // nome do item
@@ -89,54 +83,39 @@ int load_items(items *itemsList){
         itemsList[item].username_owner = token; // username do vendedor
         token = strtok(NULL,"\n");
         itemsList[item].username_best_option = token; //username da melhor opcao de comprador
-        token = strtok(NULL,SPACE);
+
+        item++;
 
     }
+
+    printf("\n");
+
+    fclose(fItems);
 
     return 1;
 }
 
-void list_items_to_sell(items *itemsList){
-
-    for(int i=0;i<NITEMS;i++){
-        printf("%d %s %s %d  %d  %d  %s %s \n",
-        itemsList[i].id,
-        itemsList[i].name,
-        itemsList[i].category,
-        itemsList[i].current_price,
-        itemsList[i].buy_now_price,
-        itemsList[i].time_left,
-        itemsList[i].username_owner,
-        itemsList[i].username_best_option);
-    }
-
-}
 int getPromoters(){
+
     char *promoFileName = getenv("FPROMOTERS");
+    FILE * f;
+    int prom = 0;
+    char Buffer[120];
     
-    int fpromo,size;
-    char promoBuffer[BUF_SIZE];
-    char *token;
+    f = fopen(promoFileName,"r");
 
-    fpromo = open(promoFileName, O_RDONLY);
-
-    if (fpromo == -1)
+    if (!f)
         printf(FILE_ERROR);
+    
+    while(fgets(Buffer,sizeof(Buffer),f)){
 
-    size = read(fpromo,promoBuffer, sizeof(promoBuffer));
-    promoBuffer[size] = '\0';
+        namePromoters[prom] = Buffer;
+        prom++;
 
-    close(fpromo);
-
-    token = strtok(promoBuffer,"\n");
-
-    for(int i=0; i<NPROMOTERS; i++){
-
-        namePromoters[i] = token; 
-
-        token = strtok(NULL,"\n"); 
     }
 
+    fclose(f);
+    
     return 1;
 }
 
