@@ -2,15 +2,16 @@
 #include "frontend.h"
  
 int main(int argc, char **argv) {
-
+    
     tryLogin login;
+    user MyAccount;
     int fc,fs,nBytes,i;
     char command[MSG_TAM];
     char fifo_cli[50];
     
     setbuf(stdout,NULL);
 
-    if(argc < 3){
+    if(argc != 3){
          printf(WRONG_INPUT);
          exit(1);
     }
@@ -30,10 +31,12 @@ int main(int argc, char **argv) {
 
 
     sprintf(fifo_cli,FIFO_CLI,login.my_pid);
-
     //Create fifo for client
     if(access(fifo_cli,F_OK) != 0)
         mkfifo(fifo_cli,0666);
+
+
+    //Sending login struct to backend
 
     fs = open(FIFO_SRV, O_WRONLY);
 
@@ -47,30 +50,43 @@ int main(int argc, char **argv) {
 
     close(fs);
 
-    /*fc = open(fifo_cli,O_RDONLY);
+
+    // open fifo to read server response
+
+    fc = open(fifo_cli,O_RDWR);
 
     if(fc == -1){
-        printf("ERROR FIFO SERVER\n");
+        printf("ERROR TO OPEN FIFO SERVER\n");
         unlink(fifo_cli);
         exit(1);
     }
 
     nBytes = read(fc,&MyAccount,sizeof(user));
     
-    if(MyAccount.status == 0){
-        printf("USER DATA INVALID\n");
-        unlink(fifo_cli);
-        exit(EXIT_FAILURE);
-    }else
-        printf("(Name:%s | Balance:%d)\n",MyAccount.name,MyAccount.money);
+    printf("--%d--\n",MyAccount.status);
+
+    if(MyAccount.status == 1){
+
+        printf("<SERVER> your account(Name:%s | Balance: %d)\n",MyAccount.name,MyAccount.money);
+
+    }else{
+        
+         printf("<SERVER> USER DATA INVALID\n");
+         unlink(fifo_cli);
+         exit(EXIT_FAILURE);
+
+    }
 
     close(fc);
-    */
+    
+    // start command reading lopp
 
     while(FOREVER){
 
         int result_command;
-        
+
+        printf("\n<FRONTEND>");
+
         fgets(command,MSG_TAM-1,stdin);
         command[strlen(command)-1] = '\0';
         

@@ -9,10 +9,12 @@ int main(int argc, char *argv[], char **envp)
     items itemsList[MAX_ITEMS];
     tryLogin login;
     client users[MAX_USERS];
+    user userData;
     fd_set fds;
     
     init_env_var();
-    printf("<SERVER> Running....");
+
+    printf("<SERVER> Running...\n");
 
     setbuf(stdout,NULL);
 
@@ -21,7 +23,7 @@ int main(int argc, char *argv[], char **envp)
     }
 
     do{
-
+        
         fd = open(FIFO_SRV,O_RDWR);
 
         if(fd == -1){
@@ -51,6 +53,7 @@ int main(int argc, char *argv[], char **envp)
                 if (setup_command(command) == 0)
                     printf(WRONG_SINTAXE);
 
+
         }else if(res > 0 && FD_ISSET(fd,&fds)){
 
                 char *userFileName = getenv("FUSERS");
@@ -71,14 +74,69 @@ int main(int argc, char *argv[], char **envp)
                     exit(1);
                 }
 
-                if(isUserValid(try_psw,try_username) == 1)
+                int validation = isUserValid(try_psw,try_username);
+                
+                userData.status == 0;
 
-                    printf("\n(pid:%d)->Login\n",login.my_pid);
+                if(validation == 1){
+                    
+                    sprintf(fifo_cli,FIFO_CLI,login.my_pid);
+                    printf("\n<SERVER> pid:%d | name:%s (LOGGED IN!)\n",login.my_pid,try_username);
+                    int fr = open(fifo_cli,O_WRONLY);
 
-                else {
+                    if(fr == -1){
 
-                    printf("\n(pid:%d)->Login Failed\n",login.my_pid);
+                        printf(FILE_ERROR);
 
+                    }else{
+                        
+                        int i;
+                        for(i = 0; try_username[i] != '\0';i++)
+                            userData.name[i] = try_username[i];
+
+                        userData.name[i] = '\0';
+
+                        userData.money = getUserBalance(try_username);
+                        
+                        userData.status = 1;
+
+                        nBytes = write(fr,&userData,sizeof(user));
+
+                        
+                    }
+
+                    close(fr);
+
+                }else if(validation == 0){
+
+                    sprintf(fifo_cli,FIFO_CLI,login.my_pid);
+                    int fr = open(fifo_cli,O_WRONLY);
+
+                    if(fr == -1){
+
+                        printf(FILE_ERROR);
+
+                    }else{
+
+                        int i;
+                        for(i = 0; try_username[i] != '\0';i++)
+                            userData.name[i] = try_username[i];
+                        userData.name[i] = '\0';
+
+                        userData.money = 0;
+                    
+                        userData.status = -1;
+                        
+                        nBytes = write(fr,&userData,sizeof(user));
+
+                    }
+
+                    close(fr);
+
+                }else{
+                    printf("ERROR USING (USERS) LIBRARY!");
+                    unlink(FIFO_SRV);
+                    exit(1);
                 }
 
         }else{
@@ -227,6 +285,7 @@ int setup_command(char *command)
     if (strcmp(token, LIST[NUMBER_OF_COMMANDS - 1]) == 0)
     {
         sleep(1);
+        unlink(FIFO_SRV);
         printf("Closing everything...\n");
         exit(EXIT_SUCCESS);
     }

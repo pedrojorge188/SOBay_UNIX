@@ -33,7 +33,7 @@
 char *LIST[] = {"users", "list", "kick", "prom", "reprom", "cancel", "close"};
 int LIST_INDEX[] = {0, 0, 1, 0, 0, 1, 0};
 char SPACE[] = {" "};
-int WRONG = 0;
+int WRONG = 0, CONNECTED_USERS = 0;
 
 
 /*Reading Defauls*/
@@ -42,7 +42,7 @@ char *namePromoters[NUSERS];
 
 /*Setup all data structs*/
 typedef struct client{
-    char *name;
+    char name[50];
     int password;
     int balance;
     bool connection;
