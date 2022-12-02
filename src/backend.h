@@ -1,15 +1,7 @@
 #ifndef BACKEND_H
 #define BACKEND_H
 
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <signal.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <fcntl.h>
-
+#include "utils.h"
 #include "users_lib.h"
 
 #define FOREVER 1
@@ -57,6 +49,7 @@ typedef struct client{
     int balance;
     bool connection;
 }client;
+
 
 typedef struct items{
     int id;

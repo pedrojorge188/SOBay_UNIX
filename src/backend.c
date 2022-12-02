@@ -1,47 +1,84 @@
 #include "backend.h"
-
 extern char **environ;
-
+ 
 int main(int argc, char *argv[], char **envp)
-{
-    char command[MSG_TAM];
+{   
+    int result_command,res,nBytes,fd;
+    char command[MSG_TAM],fifo_cli[50];
     items itemsList[MAX_ITEMS];
-
+    tryLogin login;
+    fd_set fds;
+    
     init_env_var();
+    printf("<SERVER> Running....");
 
     setbuf(stdout,NULL);
 
+    if(access(FIFO_SRV, F_OK) != 0) {
+        mkfifo(FIFO_SRV, 0666);
+    }
 
-    while (FOREVER)
-    {
+    do{
 
-        int result_command;
-        
-        printf("<ADMIN> -> ");
+        fd = open(FIFO_SRV,O_RDWR);
 
-        fgets(command,MSG_TAM-1,stdin);
-
-        command[strlen(command)-1] = '\0';
-
-        if (strcmp(command, "startProm") == 0)
-
-            run_promoter("./black_friday");
-
-        else if (strcmp(command, "startUsers") == 0){
-
-            run_users();
+        if(fd == -1){
+            printf("ERROR TO OPEN SERVER PIPE");
+            unlink(FIFO_SRV);
+            exit(EXIT_FAILURE);
         }
+
+        FD_ZERO(&fds); //reset fds pointer 
+        FD_SET(0,&fds);  //define input as stdin
+        FD_SET(fd,&fds); //define pipe input (in this case we'r refering to fd)
+
+        printf("\n<ADMIN>");
+
+        res = select(fd+1,&fds,NULL,NULL,NULL);
+
+        if(res == 0){
+
+                 printf("<SERVER> ANY DATA TO READ!");
+
+        }else if(res > 0 && FD_ISSET(0,&fds)){
+
+
+                fgets(command,MSG_TAM-1,stdin);
+                command[strlen(command)-1] = '\0';
+
+                if (setup_command(command) == 0)
+                    printf(WRONG_SINTAXE);
+
+        }else if(res > 0 && FD_ISSET(fd,&fds)){
+
+                nBytes = read(fd,&login,sizeof(tryLogin));
+
+                char try_psw[50],try_username[50];
+
+                for (int i=0; login.username[i] != '\0'; i++)
+                     try_username[i] = login.username[i];
+
+                for(int i=0;login.psw[i] != '\0';i++)
+                      try_psw[i] = login.psw[i];
+
+                printf("\n(pid:%d)",login.my_pid);
+                printf("\n(nome:%s)",try_username);
+                printf("\n(password:%s)",try_psw);
+                
         
-        else if (strcmp(command,"execItems") == 0)
-             
-             load_items((items *)&itemsList);
+        }else{
 
-        else if (setup_command(command) == 0)
-
-            printf(WRONG_SINTAXE);
+            printf("ERROR (SELECT)\n");
+            unlink(FIFO_SRV);
+            exit(EXIT_FAILURE);
+        }
 
         setbuf(stdin, NULL);
-    }
+        close(fd);
+
+    }while(command != "close");
+
+    unlink(FIFO_SRV);
 
     return 0;
 }
@@ -284,7 +321,7 @@ int setup_command(char *command)
     {
         sleep(1);
         printf("Closing everything...\n");
-        exit(1);
+        exit(EXIT_SUCCESS);
     }
 
     for (int i = 0; i < NUMBER_OF_COMMANDS; i++)

@@ -1,17 +1,11 @@
 #ifndef FRONTEND_H
 #define FRONTEND_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <signal.h>
-#include <unistd.h>
-#include <stdlib.h>
+#include "utils.h"
 
 
-#define VALID 1
+#define FOREVER 1
 #define NUMBER_OF_COMMANDS 11
-
 #define HEARTBEAT_TIMER 20;
 #define MSG_TAM 50
 
@@ -28,19 +22,6 @@ char *LIST[]= {"sell", "list", "licat", "lisel", "lival", "litime", "time", "buy
 int LIST_INDEX[] = {5, 0, 1, 1, 1, 1, 0, 2, 0, 1, 0};
 char SPACE[] = {" "};
 int WRONG = 0;
-
-/*Setup all data structs*/
-typedef struct user{
-    char *name;
-    int money;
-    int id_items;
-}user;
-
-typedef struct tryLogin{
-    int my_pid;
-    char *username;
-    char *psw;
-}tryLogin;
 
 int setup_command(char *command);
 

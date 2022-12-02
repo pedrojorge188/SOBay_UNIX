@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "signal.h": "c",
-        "fcntl.h": "c"
+        "fcntl.h": "c",
+        "string.h": "c",
+        "backend.h": "c"
     }
 }
