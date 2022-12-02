@@ -70,8 +70,9 @@ int main(int argc, char **argv) {
     while(FOREVER){
 
         int result_command;
-        printf("<CLIENT: %s> : ",login.username);
-        scanf("%[^\n]", command);
+        
+        fgets(command,MSG_TAM-1,stdin);
+        command[strlen(command)-1] = '\0';
         
         result_command = setup_command(command);
 

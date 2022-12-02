@@ -42,10 +42,8 @@ char *namePromoters[NUSERS];
 
 /*Setup all data structs*/
 typedef struct client{
-    int user_pid;
     char *name;
     int password;
-    int *id_own_items;
     int balance;
     bool connection;
 }client;
@@ -74,6 +72,4 @@ int run_promoter(char *promoterName);
 void init_env_var();
 void list_items_to_sell(items *itemsList);
 int load_items(items *itemsList);
-int run_users();
-int getUsers();
 #endif

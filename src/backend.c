@@ -3,10 +3,12 @@ extern char **environ;
  
 int main(int argc, char *argv[], char **envp)
 {   
-    int result_command,res,nBytes,fd;
+    int res,nBytes,fd;
     char command[MSG_TAM],fifo_cli[50];
+    
     items itemsList[MAX_ITEMS];
     tryLogin login;
+    client users[MAX_USERS];
     fd_set fds;
     
     init_env_var();
@@ -51,9 +53,12 @@ int main(int argc, char *argv[], char **envp)
 
         }else if(res > 0 && FD_ISSET(fd,&fds)){
 
+                char *userFileName = getenv("FUSERS");
+
                 nBytes = read(fd,&login,sizeof(tryLogin));
 
                 char try_psw[50],try_username[50];
+                int user_balance;
 
                 for (int i=0; login.username[i] != '\0'; i++)
                      try_username[i] = login.username[i];
@@ -61,11 +66,21 @@ int main(int argc, char *argv[], char **envp)
                 for(int i=0;login.psw[i] != '\0';i++)
                       try_psw[i] = login.psw[i];
 
-                printf("\n(pid:%d)",login.my_pid);
-                printf("\n(nome:%s)",try_username);
-                printf("\n(password:%s)",try_psw);
-                
-        
+                if(loadUsersFile(userFileName) == -1){
+                    printf("%s\n", getLastErrorText());
+                    exit(1);
+                }
+
+                if(isUserValid(try_psw,try_username) == 1)
+
+                    printf("\n(pid:%d)->Login\n",login.my_pid);
+
+                else {
+
+                    printf("\n(pid:%d)->Login Failed\n",login.my_pid);
+
+                }
+
         }else{
 
             printf("ERROR (SELECT)\n");
@@ -197,114 +212,6 @@ int run_promoter(char *promoterName)
         close(tube[RD]);
     }
     
-}
-
-int getUsers(){
-    char *usersFileName = getenv("FUSERS");
-    
-    int fUsers,size;
-    char UserBuffer[BUF_SIZE];
-    char *token;
-
-    fUsers = open(usersFileName, O_RDONLY);
-
-    if (fUsers == -1)
-        printf(FILE_ERROR);
-
-    size = read(fUsers,UserBuffer, sizeof(UserBuffer));
-    UserBuffer[size] = '\0';
-
-    close(fUsers);
-
-    token = strtok(UserBuffer,SPACE);
-
-    for(int i=0; i<NUSERS; i++){
-        nameUsers[i] = token; // store Users name
-        token = strtok(NULL,"\n"); //Get to the end of line
-        token = strtok(NULL,SPACE); //Get users name
-    }
-    return 0;
-}
-
-int run_users(){
-    int opcao = -1, resultado, sal;
-    char *user, *pass;
-
-    char *userFileName = getenv("FUSERS");
-
-    getUsers();
-
-    if(loadUsersFile(userFileName) == -1){
-        printf("%s\n", getLastErrorText());
-        exit(1);
-    }
-
-    do{
-        printf("\nDigite numero da função pretendida:\n0 -> validarUser, 1 -> SaldoUser, 2 -> SaldoUpdateUser, 3 -> Sair\n");
-        scanf("%d", &opcao);
-
-        switch(opcao){
-            case 0:
-                printf("Qual o user e password a validar (user pass)?\n");
-                scanf("%s %s", user, pass);
-
-                resultado=isUserValid(user, pass);
-                if(resultado == -1){
-                    printf("%s\n", getLastErrorText());
-                }else if(resultado == 0){
-                    printf("User ou password erradas...\n");
-                }else if(resultado == 1){
-                    printf("O User existe e a password está certa\n");
-                }
-
-                break;
-
-            case 1:
-                printf("Qual o user a verificar saldo?\n");
-                scanf("%s", user);
-
-                resultado=getUserBalance(user);
-                if(resultado == -1){
-                    printf("%s\n", getLastErrorText());
-                }else{
-                    printf("O saldo do User é %d\n", resultado);
-                }
-
-                break;
-
-            case 2:
-                printf("Qual o user e valor a alterar no saldo (user value)?\n");
-                scanf("%s %d", user, &sal);
-
-                resultado=updateUserBalance(user, sal);
-                if(resultado == 0){
-                    printf("%s\n", getLastErrorText());
-                }else if(resultado == -1){
-                    printf("Saldo atualizado com sucesso\n");
-                }
-                break;
-
-            case 3:
-                resultado=saveUsersFile(userFileName);
-                if(resultado == -1){
-                    printf("%s\n", getLastErrorText());
-                }else if(resultado == 0){
-                    printf("Dados guardados com sucesso\n");
-                }
-                break;  
-
-            default:
-                break;
-        }
-
-        for (int i = 0; i < NUSERS; i++)
-        {
-            updateUserBalance(nameUsers[i], getUserBalance(nameUsers[i])-1);
-        }
-
-    }while(opcao != 3);
-    
-    return 0;
 }
 
 int setup_command(char *command)
