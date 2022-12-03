@@ -1,5 +1,5 @@
-testeUm teste 50
-teste teste 50
-exemplo dois 21
-pessoa pessoa 18
-pedro jorge 25
+teste teste 10
+pedro teste 40
+pessoa teste 25
+rodrigo teste 20
+travassos teste 34

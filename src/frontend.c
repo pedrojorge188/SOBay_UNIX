@@ -16,69 +16,73 @@ int main(int argc, char **argv) {
          exit(1);
     }
 
-
-    login.my_pid = getpid();
-
-    for(i = 0; i < strlen(argv[1]);i++){
-        login.username[i] = argv[1][i];
-    }
-        login.username[i] = '\0';
-
-      for(i = 0; i < strlen(argv[2]);i++){
-        login.psw[i] = argv[2][i];
-    }
-        login.psw[i] = '\0';
-
-
-    sprintf(fifo_cli,FIFO_CLI,login.my_pid);
-    //Create fifo for client
-    if(access(fifo_cli,F_OK) != 0)
-        mkfifo(fifo_cli,0666);
-
-
-    //Sending login struct to backend
-
-    fs = open(FIFO_SRV, O_WRONLY);
-
-    if(fs == -1){
-        printf("SERVER NOT RUNNING!\n");
-        unlink(fifo_cli);
-        exit(EXIT_FAILURE);
-    }
-
-    nBytes = write(fs,&login,sizeof(tryLogin));
-
-    close(fs);
-
-
-    // open fifo to read server response
-
-    fc = open(fifo_cli,O_RDWR);
-
-    if(fc == -1){
-        printf("ERROR TO OPEN FIFO SERVER\n");
-        unlink(fifo_cli);
-        exit(1);
-    }
-
-    nBytes = read(fc,&MyAccount,sizeof(user));
     
-    printf("--%d--\n",MyAccount.status);
+    if(CONNECTED_USERS < MAX_USERS){
 
-    if(MyAccount.status == 1){
+        login.my_pid = getpid();
 
-        printf("<SERVER> your account(Name:%s | Balance: %d)\n",MyAccount.name,MyAccount.money);
+        for(i = 0; i < strlen(argv[1]);i++){
+            login.username[i] = argv[1][i];
+        }
 
-    }else{
+        for(i = 0; i < strlen(argv[2]);i++){
+            login.psw[i] = argv[2][i];
+        }
+
+
+        sprintf(fifo_cli,FIFO_CLI,login.my_pid);
+        //Create fifo for client
+        if(access(fifo_cli,F_OK) != 0)
+            mkfifo(fifo_cli,0666);
+
+        fs = open(FIFO_SRV, O_WRONLY);
+
+        if(fs == -1){
+            printf("SERVER NOT RUNNING!\n");
+            unlink(fifo_cli);
+            exit(EXIT_FAILURE);
+        }
+
+        nBytes = write(fs,&login,sizeof(tryLogin));
+
+        close(fs);
+
+        // open fifo to read server response
+
+        fc = open(fifo_cli,O_RDWR);
+
+        if(fc == -1){
+            printf("ERROR TO OPEN FIFO SERVER\n");
+            unlink(fifo_cli);
+            exit(1);
+        }
+
+        nBytes = read(fc,&MyAccount,sizeof(user));
         
-         printf("<SERVER> USER DATA INVALID\n");
-         unlink(fifo_cli);
-         exit(EXIT_FAILURE);
+        printf("--%d--\n",MyAccount.status);
 
-    }
+        if(MyAccount.status == USER_LOGIN_SUCCESS){
 
-    close(fc);
-    
+            printf("<SERVER> your account(Name:%s | Balance: %d)\n",MyAccount.name,MyAccount.money);
+
+        }else if(MyAccount.status == USER_NOT_FOUND){
+            
+            printf("<SERVER> USER DATA INVALID\n");
+            unlink(fifo_cli);
+            exit(EXIT_FAILURE);
+
+        }else{
+
+            unlink(fifo_cli);
+            exit(EXIT_FAILURE);
+
+        }
+
+        close(fc);
+        
+    }else
+        exit(EXIT_FAILURE);
+   
     // start command reading lopp
 
     while(FOREVER){

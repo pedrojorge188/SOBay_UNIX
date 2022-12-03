@@ -36,8 +36,6 @@ int main(int argc, char *argv[], char **envp)
         FD_SET(0,&fds);  //define input as stdin
         FD_SET(fd,&fds); //define pipe input (in this case we'r refering to fd)
 
-        printf("\n<ADMIN>");
-
         res = select(fd+1,&fds,NULL,NULL,NULL);
 
         if(res == 0){
@@ -46,7 +44,7 @@ int main(int argc, char *argv[], char **envp)
 
         }else if(res > 0 && FD_ISSET(0,&fds)){
 
-
+                printf("\n<ADMIN>");
                 fgets(command,MSG_TAM-1,stdin);
                 command[strlen(command)-1] = '\0';
 
@@ -56,88 +54,80 @@ int main(int argc, char *argv[], char **envp)
 
         }else if(res > 0 && FD_ISSET(fd,&fds)){
 
-                char *userFileName = getenv("FUSERS");
+            if(CONNECTED_USERS < MAX_USERS){
 
-                nBytes = read(fd,&login,sizeof(tryLogin));
+                    char *userFileName = getenv("FUSERS");
 
-                char try_psw[50],try_username[50];
-                int user_balance;
+                    nBytes = read(fd,&login,sizeof(tryLogin));
 
-                for (int i=0; login.username[i] != '\0'; i++)
-                     try_username[i] = login.username[i];
+                    int user_balance;
 
-                for(int i=0;login.psw[i] != '\0';i++)
-                      try_psw[i] = login.psw[i];
-
-                if(loadUsersFile(userFileName) == -1){
-                    printf("%s\n", getLastErrorText());
-                    exit(1);
-                }
-
-                int validation = isUserValid(try_psw,try_username);
-                
-                userData.status == 0;
-
-                if(validation == 1){
-                    
-                    sprintf(fifo_cli,FIFO_CLI,login.my_pid);
-                    printf("\n<SERVER> pid:%d | name:%s (LOGGED IN!)\n",login.my_pid,try_username);
-                    int fr = open(fifo_cli,O_WRONLY);
-
-                    if(fr == -1){
-
-                        printf(FILE_ERROR);
-
-                    }else{
-                        
-                        int i;
-                        for(i = 0; try_username[i] != '\0';i++)
-                            userData.name[i] = try_username[i];
-
-                        userData.name[i] = '\0';
-
-                        userData.money = getUserBalance(try_username);
-                        
-                        userData.status = 1;
-
-                        nBytes = write(fr,&userData,sizeof(user));
-
-                        
+                    if(loadUsersFile(userFileName) == -1){
+                        printf("%s\n", getLastErrorText());
+                        exit(1);
                     }
 
-                    close(fr);
+                    int validation = isUserValid(login.username,login.psw);
 
-                }else if(validation == 0){
+                    if(validation == 1){ //password or username correct
+                        
+                        sprintf(fifo_cli,FIFO_CLI,login.my_pid);
+                        printf("\n<SERVER> pid:%d | name:%s (LOGGED IN!)\n",login.my_pid,login.username);
+                        int fr = open(fifo_cli,O_WRONLY);
 
-                    sprintf(fifo_cli,FIFO_CLI,login.my_pid);
-                    int fr = open(fifo_cli,O_WRONLY);
+                        if(fr == -1){
 
-                    if(fr == -1){
+                            printf(FILE_ERROR);
 
-                        printf(FILE_ERROR);
+                        }else{
+                            
+                            for(int i = 0; i < strlen(login.username);i++)
+                                userData.name[i] = login.username[i];
+
+                            userData.money = getUserBalance(login.username);
+                            
+                            userData.status = CONNECT_TRUE;
+
+                            nBytes = write(fr,&userData,sizeof(user));
+
+                            CONNECTED_USERS++;
+                            
+                        }
+
+                        close(fr);
+
+                    }else if(validation == 0){ //password or username invalid
+
+                        sprintf(fifo_cli,FIFO_CLI,login.my_pid);
+                        int fr = open(fifo_cli,O_WRONLY);
+
+                        if(fr == -1){
+
+                            printf(FILE_ERROR);
+
+                        }else{
+
+                            for(int i = 0; i < strlen(login.username);i++)
+                                userData.name[i] = login.username[i];
+
+                            userData.money = 0;
+                        
+                            userData.status = -1;
+                            
+                            nBytes = write(fr,&userData,sizeof(user));
+
+                        }
+
+                        close(fr);
 
                     }else{
-
-                        int i;
-                        for(i = 0; try_username[i] != '\0';i++)
-                            userData.name[i] = try_username[i];
-                        userData.name[i] = '\0';
-
-                        userData.money = 0;
-                    
-                        userData.status = -1;
-                        
-                        nBytes = write(fr,&userData,sizeof(user));
-
+                        printf("ERROR USING (USERS) LIBRARY!");
+                        unlink(FIFO_SRV);
+                        exit(1);
                     }
-
-                    close(fr);
-
-                }else{
-                    printf("ERROR USING (USERS) LIBRARY!");
-                    unlink(FIFO_SRV);
-                    exit(1);
-                }
+            }else
+                printf("\n<SERVER> MAX USERS REACHED!\n");
+            
 
         }else{
 

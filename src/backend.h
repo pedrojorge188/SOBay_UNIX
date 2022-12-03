@@ -22,23 +22,21 @@
 
 //Const's files
 #define MAX_ITEMS 30
-#define MAX_USERS 20
 #define MAX_PROMOS 10
-#define NUSERS 10
 #define NPROMOTERS 10
 
-
+//MAX USERS -> utils.h ...
 
 //Global Commands defualts
 char *LIST[] = {"users", "list", "kick", "prom", "reprom", "cancel", "close"};
 int LIST_INDEX[] = {0, 0, 1, 0, 0, 1, 0};
 char SPACE[] = {" "};
-int WRONG = 0, CONNECTED_USERS = 0;
+int WRONG = 0;
 
 
 /*Reading Defauls*/
-char *nameUsers[NUSERS];
-char *namePromoters[NUSERS];
+char *nameUsers[MAX_USERS];
+char *namePromoters[NPROMOTERS];
 
 /*Setup all data structs*/
 typedef struct client{
