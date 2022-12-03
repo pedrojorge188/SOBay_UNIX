@@ -31,7 +31,6 @@ int main(int argc, char **argv) {
 
 
         sprintf(fifo_cli,FIFO_CLI,login.my_pid);
-        //Create fifo for client
         if(access(fifo_cli,F_OK) != 0)
             mkfifo(fifo_cli,0666);
 
@@ -59,11 +58,11 @@ int main(int argc, char **argv) {
 
         nBytes = read(fc,&MyAccount,sizeof(user));
         
-        printf("--%d--\n",MyAccount.status);
+        printf("--%d--\n",login.my_pid);
 
         if(MyAccount.status == USER_LOGIN_SUCCESS){
 
-            printf("<SERVER> your account(Name:%s | Balance: %d)\n",MyAccount.name,MyAccount.money);
+            printf("<SERVER>WELCOME(Name:%s | Balance: %d)\n",login.username,MyAccount.money);
 
         }else if(MyAccount.status == USER_NOT_FOUND){
             
@@ -83,8 +82,7 @@ int main(int argc, char **argv) {
     }else
         exit(EXIT_FAILURE);
    
-    // start command reading lopp
-
+    
     while(FOREVER){
 
         int result_command;
@@ -101,6 +99,7 @@ int main(int argc, char **argv) {
         
     }
 
+    unlink(fifo_cli);
     return 0;
 }
 

@@ -37,6 +37,7 @@ int main(int argc, char *argv[], char **envp)
         FD_SET(fd,&fds); //define pipe input (in this case we'r refering to fd)
 
         res = select(fd+1,&fds,NULL,NULL,NULL);
+        printf("\n<ADMIN>");
 
         if(res == 0){
 
@@ -44,14 +45,19 @@ int main(int argc, char *argv[], char **envp)
 
         }else if(res > 0 && FD_ISSET(0,&fds)){
 
-                printf("\n<ADMIN>");
                 fgets(command,MSG_TAM-1,stdin);
                 command[strlen(command)-1] = '\0';
 
                 if (setup_command(command) == 0)
+
                     printf(WRONG_SINTAXE);
 
-
+                else{
+                    
+                    if(strcmp(command,"users") == 0)
+                        list_users((client *)&users);
+                }
+                
         }else if(res > 0 && FD_ISSET(fd,&fds)){
 
             if(CONNECTED_USERS < MAX_USERS){
@@ -89,6 +95,13 @@ int main(int argc, char *argv[], char **envp)
                             userData.status = CONNECT_TRUE;
 
                             nBytes = write(fr,&userData,sizeof(user));
+
+                            for(int i = 0; i < strlen(login.username);i++)
+                                 users[CONNECTED_USERS].name[i] = login.username[i];
+
+                            users[CONNECTED_USERS].pid = login.my_pid;
+                            users[CONNECTED_USERS].balance = userData.money;
+                            users[CONNECTED_USERS].connection = true;
 
                             CONNECTED_USERS++;
                             
@@ -219,6 +232,28 @@ int getPromoters(){
     return 1;
 }
 
+void list_users(client *users){
+
+
+    if(CONNECTED_USERS > 0){
+
+        printf("\n<SERVER> USERS CONNECTED\n");
+
+        for(int i=0;i<CONNECTED_USERS;i++){
+
+            if(users[i].connection == true){
+                printf("PID:%d\t",users[i].pid);
+                printf("NAME:%s\t",users[i].name);
+                printf("BALANCE:%d\n",users[i].balance);
+             }
+        }
+
+    }else
+        printf("\n<SERVER> ANY USER TO LIST\n");
+    
+
+}
+
 int run_promoter(char *promoterName)
 {
     char *promoter1;
@@ -333,6 +368,7 @@ int setup_command(char *command)
     {
         // end to backend the command
         printf("Executing command...\n");
+        
         return 1;
     }
 }

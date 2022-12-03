@@ -40,8 +40,8 @@ char *namePromoters[NPROMOTERS];
 
 /*Setup all data structs*/
 typedef struct client{
+    int pid;
     char name[50];
-    int password;
     int balance;
     bool connection;
 }client;
@@ -68,6 +68,7 @@ typedef struct promoter{
 int setup_command(char *command);
 int run_promoter(char *promoterName);
 void init_env_var();
+void list_users(client *users);
 void list_items_to_sell(items *itemsList);
 int load_items(items *itemsList);
 #endif

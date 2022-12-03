@@ -1,5 +1,5 @@
 teste teste 10
-pedro teste 40
+pedro teste 60
 pessoa teste 25
 rodrigo teste 20
 travassos teste 34
