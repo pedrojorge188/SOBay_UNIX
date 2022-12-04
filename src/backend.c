@@ -14,12 +14,19 @@ int main(int argc, char *argv[], char **envp)
     
     init_env_var();
 
-    printf("<SERVER> Running...\n");
-
     setbuf(stdout,NULL);
 
+
     if(access(FIFO_SRV, F_OK) != 0) {
+
         mkfifo(FIFO_SRV, 0666);
+        printf("<SERVER> Running...\n");
+
+    }else{
+        
+        printf("Backend already in use!\n");
+        exit(EXIT_FAILURE);
+        
     }
 
     do{
