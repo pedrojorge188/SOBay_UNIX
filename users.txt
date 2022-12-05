@@ -2,4 +2,6 @@ teste teste 10
 pedro teste 60
 pessoa teste 25
 rodrigo teste 20
-travassos teste 34
+travassos teste 5000
+luis teste 10
+eeee teste 10

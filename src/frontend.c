@@ -83,8 +83,8 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
    
     
-    while(FOREVER){
-
+    do{
+        
         int result_command;
 
         printf("\n<FRONTEND>");
@@ -96,10 +96,11 @@ int main(int argc, char **argv) {
 
         WRONG = 0;
         setbuf(stdin,NULL);
-        
-    }
+
+    }while(FOREVER);
 
     unlink(fifo_cli);
+
     return 0;
 }
 
@@ -109,12 +110,15 @@ int setup_command(char *command){
     int ind = -1;
     int any = 0;
     int counter = 0;
+    char fifo_cli[50];
 
     token = strtok(command, SPACE);
 
     if(strcmp(token, LIST[NUMBER_OF_COMMANDS-1]) == 0){
             sleep(1);
             printf("Closing everything...\n");
+            sprintf(fifo_cli,FIFO_CLI,getpid());
+            unlink(fifo_cli);
             exit(1);
     }
 

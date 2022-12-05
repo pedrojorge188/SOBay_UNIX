@@ -1,6 +1,13 @@
 #include "backend.h"
 extern char **environ;
  
+void handle_quit(int sig){
+    puts("<SERVER> CLOSING");
+    unlink(FIFO_SRV);
+    sleep(1);
+    exit(1);
+}
+
 int main(int argc, char *argv[], char **envp)
 {   
     int res,nBytes,fd;
@@ -30,6 +37,8 @@ int main(int argc, char *argv[], char **envp)
     }
 
     do{
+
+        signal(SIGINT,handle_quit);
         
         fd = open(FIFO_SRV,O_RDWR);
 
@@ -131,9 +140,7 @@ int main(int argc, char *argv[], char **envp)
                                 userData.name[i] = login.username[i];
 
                             userData.money = 0;
-                        
                             userData.status = -1;
-                            
                             nBytes = write(fr,&userData,sizeof(user));
 
                         }
