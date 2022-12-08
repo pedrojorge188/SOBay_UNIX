@@ -1,7 +1,6 @@
 #include "backend.h"
 extern char **environ;
  
-
 void handle_quit(int sig){
 
     unlink(FIFO_SRV);
@@ -69,9 +68,18 @@ int main(int argc, char *argv[], char **envp)
                     printf(WRONG_SINTAXE);
 
                 else{
-                    
+
                     if(strcmp(command,"users") == 0)
                         list_users((client *)&users);
+                    
+                    if(strcmp(command,"list") == 0)
+                        load_items((items *)&itemsList);
+
+
+                    if(strcmp(command,"kick") == 0)
+                        kick_user(command + 5,(client *)&users);
+
+
                 }
                 
         }else if(res > 0 && FD_ISSET(fd,&fds)){
@@ -108,7 +116,7 @@ int main(int argc, char *argv[], char **envp)
                             for(i = 0; i < strlen(login.username);i++)
                                 userData.name[i] = login.username[i];
                             
-                            userData.name[i+1] = '\0';
+                            userData.name[i] = '\0';
 
                             userData.money = getUserBalance(userData.name);
                             
@@ -145,11 +153,11 @@ int main(int argc, char *argv[], char **envp)
                              for(i = 0; i < strlen(login.username);i++)
                                 userData.name[i] = login.username[i];
                             
-                            userData.name[i+1] = '\0';
+                            userData.name[i] = '\0';
 
                             userData.money = 0;
                             userData.status = -1;
-                            
+
                             nBytes = write(fr,&userData,sizeof(user));
 
                         }
@@ -182,7 +190,6 @@ int main(int argc, char *argv[], char **envp)
 }
 
 int load_items(items *itemsList){
-
     char *itemsFileName = getenv("FITEMS");
     
     FILE   *fItems;
@@ -199,9 +206,10 @@ int load_items(items *itemsList){
 
     int item = 0;
 
+    printf("\n<SERVER>ITEMS!\n");
     while(fgets(itemBuffer,sizeof(itemBuffer),fItems)){
 
-        printf("-%s-",itemBuffer);
+        printf("%s",itemBuffer);
         token = strtok(itemBuffer,SPACE);
         itemsList[item].id = atoi(token); // id
         token = strtok(NULL,SPACE);
@@ -358,6 +366,8 @@ int setup_command(char *command)
             break;
         }
         counter++;
+
+
         break;
 
     case 5:
@@ -387,10 +397,7 @@ int setup_command(char *command)
         return 0;
     }
     else
-    {
-        // end to backend the command
-        printf("Executing command...\n");
-        
+    {   
         return 1;
     }
 }
@@ -405,10 +412,35 @@ void disconnect_users(){
 
         kill(pid_to_kill,SIGQUIT);
 
-        printf("\n<SERVER> %d DISCONNECTED!\n",pid_to_kill);
-
     }
 }
+
+void kick_user(char *username,client *users){
+
+    int pid_to_kill = 0;
+
+    for(int i = 0;i < CONNECTED_USERS;i++){
+        
+        if(strcmp(users[i].name,username) == 0){
+
+            pid_to_kill = users[i].pid;
+            users[i].connection = false;
+
+        }
+    }
+
+    if(pid_to_kill != 0){
+
+        kill(pid_to_kill,SIGQUIT);
+        printf("\n<SERVER>USER KICKED!\n");
+
+    }else{
+
+        printf("\n<SERVER>ANY USER TO KICK!\n");
+    }
+
+}
+
 void init_env_var(){
     setenv("FPROMOTERS", "promo.txt", 0);
     setenv("FITEMS","items.txt", 0);

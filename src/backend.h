@@ -24,6 +24,7 @@
 #define MAX_ITEMS 30
 #define MAX_PROMOS 10
 #define NPROMOTERS 10
+#define RANGE 500
 
 //MAX USERS -> utils.h ...
 
@@ -35,7 +36,7 @@ int WRONG = 0;
 
 
 /*Reading Defauls*/
-int pidUsers[MAX_USERS];
+int pidUsers[RANGE];
 char *namePromoters[NPROMOTERS];
 
 /*Setup all data structs*/
@@ -72,4 +73,5 @@ void list_users(client *users);
 void list_items_to_sell(items *itemsList);
 int load_items(items *itemsList);
 void disconnect_users();
+void kick_user(char *username,client *users);
 #endif

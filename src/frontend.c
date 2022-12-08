@@ -15,7 +15,7 @@ void backend_sigs(int sig){
 
     char fifo_cli[50];
 
-    printf("\n<SERVER> BACKEND WAS CLOSED!\n");
+    printf("\n<SERVER> %s",KICK_LOG);
     sprintf(fifo_cli,FIFO_CLI,getpid());
     unlink(fifo_cli);
     exit(1);
