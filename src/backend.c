@@ -1,10 +1,15 @@
 #include "backend.h"
 extern char **environ;
  
+
 void handle_quit(int sig){
-    puts("<SERVER> CLOSING");
+
     unlink(FIFO_SRV);
-    sleep(1);
+    
+    puts("\n<SERVER> CLOSING ...");
+
+    disconnect_users();
+
     exit(1);
 }
 
@@ -15,9 +20,9 @@ int main(int argc, char *argv[], char **envp)
     
     items itemsList[MAX_ITEMS];
     tryLogin login;
-    client users[MAX_USERS];
     user userData;
     fd_set fds;
+    client users[MAX_USERS];
     
     init_env_var();
 
@@ -25,21 +30,17 @@ int main(int argc, char *argv[], char **envp)
 
 
     if(access(FIFO_SRV, F_OK) != 0) {
-
         mkfifo(FIFO_SRV, 0666);
         printf("<SERVER> Running...\n");
-
     }else{
-        
         printf("Backend already in use!\n");
         exit(EXIT_FAILURE);
-        
     }
 
     do{
 
         signal(SIGINT,handle_quit);
-        
+
         fd = open(FIFO_SRV,O_RDWR);
 
         if(fd == -1){
@@ -53,7 +54,6 @@ int main(int argc, char *argv[], char **envp)
         FD_SET(fd,&fds); //define pipe input (in this case we'r refering to fd)
 
         res = select(fd+1,&fds,NULL,NULL,NULL);
-        printf("\n<ADMIN>");
 
         if(res == 0){
 
@@ -89,12 +89,13 @@ int main(int argc, char *argv[], char **envp)
                         exit(1);
                     }
 
+                    int i;
+
                     int validation = isUserValid(login.username,login.psw);
 
                     if(validation == 1){ //password or username correct
                         
                         sprintf(fifo_cli,FIFO_CLI,login.my_pid);
-                        printf("\n<SERVER> pid:%d | name:%s (LOGGED IN!)\n",login.my_pid,login.username);
                         int fr = open(fifo_cli,O_WRONLY);
 
                         if(fr == -1){
@@ -103,18 +104,23 @@ int main(int argc, char *argv[], char **envp)
 
                         }else{
                             
-                            for(int i = 0; i < strlen(login.username);i++)
-                                userData.name[i] = login.username[i];
 
-                            userData.money = getUserBalance(login.username);
+                            for(i = 0; i < strlen(login.username);i++)
+                                userData.name[i] = login.username[i];
+                            
+                            userData.name[i+1] = '\0';
+
+                            userData.money = getUserBalance(userData.name);
                             
                             userData.status = CONNECT_TRUE;
 
                             nBytes = write(fr,&userData,sizeof(user));
 
-                            for(int i = 0; i < strlen(login.username);i++)
-                                 users[CONNECTED_USERS].name[i] = login.username[i];
+                            pidUsers[CONNECTED_USERS] = login.my_pid;
 
+                            for(i = 0; i < strlen(login.username)+1;i++)
+                                 users[CONNECTED_USERS].name[i] = userData.name[i];
+                            
                             users[CONNECTED_USERS].pid = login.my_pid;
                             users[CONNECTED_USERS].balance = userData.money;
                             users[CONNECTED_USERS].connection = true;
@@ -136,11 +142,14 @@ int main(int argc, char *argv[], char **envp)
 
                         }else{
 
-                            for(int i = 0; i < strlen(login.username);i++)
+                             for(i = 0; i < strlen(login.username);i++)
                                 userData.name[i] = login.username[i];
+                            
+                            userData.name[i+1] = '\0';
 
                             userData.money = 0;
                             userData.status = -1;
+                            
                             nBytes = write(fr,&userData,sizeof(user));
 
                         }
@@ -157,8 +166,7 @@ int main(int argc, char *argv[], char **envp)
             
 
         }else{
-
-            printf("ERROR (SELECT)\n");
+            printf("\nSELECT ERROR!\n");
             unlink(FIFO_SRV);
             exit(EXIT_FAILURE);
         }
@@ -325,7 +333,7 @@ int setup_command(char *command)
     {
         sleep(1);
         unlink(FIFO_SRV);
-        printf("Closing everything...\n");
+        disconnect_users();
         exit(EXIT_SUCCESS);
     }
 
@@ -387,6 +395,20 @@ int setup_command(char *command)
     }
 }
 
+void disconnect_users(){
+
+    int pid_to_kill;
+
+    for(int i=0;i<CONNECTED_USERS;i++){
+        
+        pid_to_kill = pidUsers[i];
+
+        kill(pid_to_kill,SIGQUIT);
+
+        printf("\n<SERVER> %d DISCONNECTED!\n",pid_to_kill);
+
+    }
+}
 void init_env_var(){
     setenv("FPROMOTERS", "promo.txt", 0);
     setenv("FITEMS","items.txt", 0);

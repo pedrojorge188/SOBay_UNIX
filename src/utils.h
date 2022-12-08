@@ -14,7 +14,7 @@
 
 //Const's Fifos (Pipes)
 #define FIFO_CLI "./tmp/cli_%d"
-#define FIFO_SRV "./tmp/adminPipe"
+#define FIFO_SRV "./tmp/fifo_login"
 #define USER_NOT_FOUND -1
 #define USER_LOGIN_SUCCESS 1
 #define CONNECT_TRUE 1
@@ -23,6 +23,7 @@
 #define MAX_USERS 20
 
 int CONNECTED_USERS = 0;
+int server_pid = 0;
 
 typedef struct{
     char name [50];

@@ -14,7 +14,7 @@ frontend: ${path}/frontend.c   ${path}/frontend.h ${path}/utils.h
 	@echo "Successful complilation of frontend!"
 
 clean:
-	rm backend frontend ${tmp_path}/cli_* ${tmp_path}/adminPipe
+	rm backend frontend ${tmp_path}/cli_* ${tmp_path}/fifo_login {tmp_path}/fifo_cmd
 	@echo "Files deleted Successfully!"
 
 

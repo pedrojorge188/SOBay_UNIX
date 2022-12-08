@@ -35,7 +35,7 @@ int WRONG = 0;
 
 
 /*Reading Defauls*/
-char *nameUsers[MAX_USERS];
+int pidUsers[MAX_USERS];
 char *namePromoters[NPROMOTERS];
 
 /*Setup all data structs*/
@@ -71,4 +71,5 @@ void init_env_var();
 void list_users(client *users);
 void list_items_to_sell(items *itemsList);
 int load_items(items *itemsList);
+void disconnect_users();
 #endif

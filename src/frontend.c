@@ -1,6 +1,26 @@
 
 #include "frontend.h"
- 
+
+void handle_quit(int sig){
+
+    char fifo_cli[50];
+
+    sprintf(fifo_cli,FIFO_CLI,getpid());
+    unlink(fifo_cli);
+    exit(1);
+
+}
+
+void backend_sigs(int sig){
+
+    char fifo_cli[50];
+
+    printf("\n<SERVER> BACKEND WAS CLOSED!\n");
+    sprintf(fifo_cli,FIFO_CLI,getpid());
+    unlink(fifo_cli);
+    exit(1);
+}
+
 int main(int argc, char **argv) {
     
     tryLogin login;
@@ -79,25 +99,27 @@ int main(int argc, char **argv) {
 
         close(fc);
         
-    }else
+    }else{
+        printf("MAX USERS REACHED!");
         exit(EXIT_FAILURE);
+    }
    
     
     do{
-        
-        int result_command;
+        signal(SIGINT,handle_quit);
+        signal(SIGQUIT,backend_sigs);
 
         printf("\n<FRONTEND>");
 
         fgets(command,MSG_TAM-1,stdin);
         command[strlen(command)-1] = '\0';
         
-        result_command = setup_command(command);
+        setup_command(command);
 
         WRONG = 0;
         setbuf(stdin,NULL);
 
-    }while(FOREVER);
+    }while(strcmp(command,"exit") != 0);
 
     unlink(fifo_cli);
 
@@ -116,7 +138,7 @@ int setup_command(char *command){
 
     if(strcmp(token, LIST[NUMBER_OF_COMMANDS-1]) == 0){
             sleep(1);
-            printf("Closing everything...\n");
+            printf("Closing...\n");
             sprintf(fifo_cli,FIFO_CLI,getpid());
             unlink(fifo_cli);
             exit(1);
