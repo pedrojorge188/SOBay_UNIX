@@ -75,4 +75,7 @@ void list_items_to_sell(items *itemsList);
 int load_items(items *itemsList);
 void disconnect_users();
 void kick_user(char *username,client *users);
+void fill_users(client *users);
+int get_ind(client *users);
+
 #endif

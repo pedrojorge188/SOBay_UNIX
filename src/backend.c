@@ -24,6 +24,7 @@ int main(int argc, char *argv[], char **envp)
     client users[MAX_USERS];
     
     init_env_var();
+    fill_users((client *)&users);
 
     setbuf(stdout,NULL);
 
@@ -100,9 +101,10 @@ int main(int argc, char *argv[], char **envp)
 
                 int validation = isUserValid(api.login.username,api.login.psw);
 
-                if(validation == 1){ //password or username correct
+                if(validation == 1 ){ //password or username correct
                     
                     sprintf(fifo_cli,FIFO_CLI,api.pid);
+
                     int fr = open(fifo_cli,O_WRONLY);
 
                     if(fr == -1){
@@ -111,31 +113,42 @@ int main(int argc, char *argv[], char **envp)
 
                     }else{
                         
+                        int ind = get_ind((client * )&users);
 
-                        for(i = 0; i < strlen(api.login.username);i++)
-                            userData.name[i] = api.login.username[i];
+                        if(ind > -1){
+
+                            for(i = 0; i < strlen(api.login.username);i++)
+                                userData.name[i] = api.login.username[i];
                         
-                        userData.name[i] = '\0';
+                            userData.name[i] = '\0';
 
-                        userData.money = getUserBalance(userData.name);
-                        
-                        userData.status = CONNECT_TRUE;
+                            userData.money = getUserBalance(userData.name);
+                            
+                            userData.status = CONNECT_TRUE;
 
-                        nBytes = write(fr,&userData,sizeof(user));
+                            nBytes = write(fr,&userData,sizeof(user));
 
-                        pidUsers[CONNECTED_USERS] = api.pid;
+                            pidUsers[helper] = api.pid; // pid's log
 
-                        for(i = 0; i < strlen(api.login.username)+1;i++)
-                                users[CONNECTED_USERS].name[i] = userData.name[i];
-                        
-                        users[CONNECTED_USERS].pid = api.pid;
-                        users[CONNECTED_USERS].balance = userData.money;
-                        users[CONNECTED_USERS].connection = true;
+                            for(i = 0; i < strlen(api.login.username)+1;i++)
+                                    users[ind].name[i] = userData.name[i];
+                            
 
-                        CONNECTED_USERS++;
+                            users[ind].pid = api.pid;
+                            users[ind].balance = userData.money;
+                            users[ind].connection = true;
+
+                            helper ++;
+                            CONNECTED_USERS++;
+
+                        }else{
+                            
+                            printf("<SERVER>MAX USERS REACHED!\n");
+
+                        }
+                    
                         
                     }
-
                     close(fr);
 
                 }else if(validation == 0){ //password or username invalid
@@ -164,9 +177,11 @@ int main(int argc, char *argv[], char **envp)
                     close(fr);
 
                 }else{
+
                     printf("ERROR USING (USERS) LIBRARY!");
                     unlink(FIFO_SRV);
                     exit(1);
+
                 }
 
             }else if(api.status == COMMAND_INFO){
@@ -271,7 +286,7 @@ void list_users(client *users){
 
         printf("\n<SERVER> USERS CONNECTED\n");
 
-        for(int i=0;i<CONNECTED_USERS;i++){
+        for(int i=0;i<MAX_USERS;i++){
 
             if(users[i].connection == true){
                 printf("PID:%d\t",users[i].pid);
@@ -408,13 +423,14 @@ void disconnect_users(){
 
     int pid_to_kill;
 
-    for(int i=0;i<CONNECTED_USERS;i++){
+    for(int i=0;i<helper;i++){
         
         pid_to_kill = pidUsers[i];
 
         kill(pid_to_kill,SIGQUIT);
 
     }
+
 }
 
 void kick_user(char *username,client *users){
@@ -436,11 +452,35 @@ void kick_user(char *username,client *users){
         kill(pid_to_kill,SIGQUIT);
         printf("\n<SERVER>USER KICKED!\n");
 
+        CONNECTED_USERS--;
+
     }else{
 
         printf("\n<SERVER>ANY USER TO KICK!\n");
     }
 
+}
+int get_ind(client *users){
+
+    for(int i=0;i < MAX_USERS;i++){
+        if(users[i].connection == false)
+            return i;    
+    }
+
+    return -1;
+}
+
+void fill_users(client *users){
+    int helper = 0;
+
+    for(int i = 0;i < MAX_USERS;i++){
+
+        users[i].name[0] = 'd';
+        users[i].pid = 0;
+        users[i].connection = false;
+        users[i].balance = 0;
+
+    }
 }
 
 void init_env_var(){

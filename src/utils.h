@@ -25,7 +25,7 @@
 #define MAX_USERS 20
 
 int CONNECTED_USERS = 0;
-int server_pid = 0;
+int helper = 0;
 
 typedef struct{
     int duration;

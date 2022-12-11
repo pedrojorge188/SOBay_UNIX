@@ -23,7 +23,9 @@ void backend_sigs(int sig){
 int main(int argc, char **argv) {
     
     notification api;
+    fd_set fds;
     user MyAccount;
+
     int fc,fs,nBytes,i;
     char command[MSG_TAM];
     char fifo_cli[50];
@@ -36,7 +38,7 @@ int main(int argc, char **argv) {
     }
 
     
-    if(CONNECTED_USERS < MAX_USERS){
+    if(CONNECTED_USERS <= MAX_USERS){
 
         api.status = LOGIN_INFO;
         api.pid = getpid();
@@ -108,15 +110,33 @@ int main(int argc, char **argv) {
         signal(SIGINT,handle_quit);
         signal(SIGQUIT,backend_sigs);
 
-        printf("\n<FRONTEND>");
+        fs = open(FIFO_SRV,O_RDWR);
 
-        fgets(command,MSG_TAM-1,stdin);
-        command[strlen(command)-1] = '\0';
-        
-        setup_command(command);
+        if(fs == -1){
+            printf("ERROR TO OPEN SERVER PIPE");
+            exit(EXIT_FAILURE);
+        }
+
+        FD_ZERO(&fds); //reset fds pointer 
+        FD_SET(0,&fds);  //define input as stdin
+        FD_SET(fs,&fds); //define pipe input (in this case we'r refering to fd)
+
+        int res = select(fs+1,&fds,NULL,NULL,NULL);
+
+
+        if(res > 0 && FD_ISSET(0,&fds)){
+
+            fgets(command,MSG_TAM-1,stdin);
+            command[strlen(command)-1] = '\0';
+            
+            if (setup_command(command) == 0)
+                printf(WRONG_COMMAND,command);
+
+        }
 
         WRONG = 0;
         setbuf(stdin,NULL);
+        close(fs);
 
     }while(strcmp(command,"exit") != 0);
 
