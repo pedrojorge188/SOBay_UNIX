@@ -4,7 +4,6 @@
 void handle_quit(int sig){
 
     char fifo_cli[50];
-
     sprintf(fifo_cli,FIFO_CLI,getpid());
     unlink(fifo_cli);
     exit(1);
@@ -23,7 +22,7 @@ void backend_sigs(int sig){
 
 int main(int argc, char **argv) {
     
-    tryLogin login;
+    notification api;
     user MyAccount;
     int fc,fs,nBytes,i;
     char command[MSG_TAM];
@@ -39,18 +38,19 @@ int main(int argc, char **argv) {
     
     if(CONNECTED_USERS < MAX_USERS){
 
-        login.my_pid = getpid();
+        api.status = LOGIN_INFO;
+        api.pid = getpid();
 
         for(i = 0; i < strlen(argv[1]);i++){
-            login.username[i] = argv[1][i];
+            api.login.username[i] = argv[1][i];
         }
 
         for(i = 0; i < strlen(argv[2]);i++){
-            login.psw[i] = argv[2][i];
+            api.login.psw[i] = argv[2][i];
         }
 
 
-        sprintf(fifo_cli,FIFO_CLI,login.my_pid);
+        sprintf(fifo_cli,FIFO_CLI,api.pid);
         if(access(fifo_cli,F_OK) != 0)
             mkfifo(fifo_cli,0666);
 
@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
             exit(EXIT_FAILURE);
         }
 
-        nBytes = write(fs,&login,sizeof(tryLogin));
+        nBytes = write(fs,&api,sizeof(notification));
 
         close(fs);
 
@@ -78,11 +78,10 @@ int main(int argc, char **argv) {
 
         nBytes = read(fc,&MyAccount,sizeof(user));
         
-        printf("--%d--\n",login.my_pid);
 
         if(MyAccount.status == USER_LOGIN_SUCCESS){
 
-            printf("<SERVER>WELCOME(Name:%s | Balance: %d)\n",login.username,MyAccount.money);
+            printf("<SERVER>WELCOME(Name:%s | Balance: %d)\n",MyAccount.name,MyAccount.money);
 
         }else if(MyAccount.status == USER_NOT_FOUND){
             

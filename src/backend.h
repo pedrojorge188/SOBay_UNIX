@@ -66,6 +66,7 @@ typedef struct promoter{
     int duration;
 }promoter;
 
+
 int setup_command(char *command);
 int run_promoter(char *promoterName);
 void init_env_var();

@@ -18,7 +18,7 @@ int main(int argc, char *argv[], char **envp)
     char command[MSG_TAM],fifo_cli[50];
     
     items itemsList[MAX_ITEMS];
-    tryLogin login;
+    notification api;
     user userData;
     fd_set fds;
     client users[MAX_USERS];
@@ -84,94 +84,96 @@ int main(int argc, char *argv[], char **envp)
                 
         }else if(res > 0 && FD_ISSET(fd,&fds)){
 
-            if(CONNECTED_USERS < MAX_USERS){
+             nBytes = read(fd,&api,sizeof(notification));
 
-                    char *userFileName = getenv("FUSERS");
+            if(api.status == LOGIN_INFO){
+                
+                char *userFileName = getenv("FUSERS");
+                int user_balance;
 
-                    nBytes = read(fd,&login,sizeof(tryLogin));
+                if(loadUsersFile(userFileName) == -1){
+                    printf("%s\n", getLastErrorText());
+                    exit(1);
+                }
 
-                    int user_balance;
+                int i;
 
-                    if(loadUsersFile(userFileName) == -1){
-                        printf("%s\n", getLastErrorText());
-                        exit(1);
-                    }
+                int validation = isUserValid(api.login.username,api.login.psw);
 
-                    int i;
+                if(validation == 1){ //password or username correct
+                    
+                    sprintf(fifo_cli,FIFO_CLI,api.pid);
+                    int fr = open(fifo_cli,O_WRONLY);
 
-                    int validation = isUserValid(login.username,login.psw);
+                    if(fr == -1){
 
-                    if(validation == 1){ //password or username correct
-                        
-                        sprintf(fifo_cli,FIFO_CLI,login.my_pid);
-                        int fr = open(fifo_cli,O_WRONLY);
-
-                        if(fr == -1){
-
-                            printf(FILE_ERROR);
-
-                        }else{
-                            
-
-                            for(i = 0; i < strlen(login.username);i++)
-                                userData.name[i] = login.username[i];
-                            
-                            userData.name[i] = '\0';
-
-                            userData.money = getUserBalance(userData.name);
-                            
-                            userData.status = CONNECT_TRUE;
-
-                            nBytes = write(fr,&userData,sizeof(user));
-
-                            pidUsers[CONNECTED_USERS] = login.my_pid;
-
-                            for(i = 0; i < strlen(login.username)+1;i++)
-                                 users[CONNECTED_USERS].name[i] = userData.name[i];
-                            
-                            users[CONNECTED_USERS].pid = login.my_pid;
-                            users[CONNECTED_USERS].balance = userData.money;
-                            users[CONNECTED_USERS].connection = true;
-
-                            CONNECTED_USERS++;
-                            
-                        }
-
-                        close(fr);
-
-                    }else if(validation == 0){ //password or username invalid
-
-                        sprintf(fifo_cli,FIFO_CLI,login.my_pid);
-                        int fr = open(fifo_cli,O_WRONLY);
-
-                        if(fr == -1){
-
-                            printf(FILE_ERROR);
-
-                        }else{
-
-                             for(i = 0; i < strlen(login.username);i++)
-                                userData.name[i] = login.username[i];
-                            
-                            userData.name[i] = '\0';
-
-                            userData.money = 0;
-                            userData.status = -1;
-
-                            nBytes = write(fr,&userData,sizeof(user));
-
-                        }
-
-                        close(fr);
+                        printf(FILE_ERROR);
 
                     }else{
-                        printf("ERROR USING (USERS) LIBRARY!");
-                        unlink(FIFO_SRV);
-                        exit(1);
+                        
+
+                        for(i = 0; i < strlen(api.login.username);i++)
+                            userData.name[i] = api.login.username[i];
+                        
+                        userData.name[i] = '\0';
+
+                        userData.money = getUserBalance(userData.name);
+                        
+                        userData.status = CONNECT_TRUE;
+
+                        nBytes = write(fr,&userData,sizeof(user));
+
+                        pidUsers[CONNECTED_USERS] = api.pid;
+
+                        for(i = 0; i < strlen(api.login.username)+1;i++)
+                                users[CONNECTED_USERS].name[i] = userData.name[i];
+                        
+                        users[CONNECTED_USERS].pid = api.pid;
+                        users[CONNECTED_USERS].balance = userData.money;
+                        users[CONNECTED_USERS].connection = true;
+
+                        CONNECTED_USERS++;
+                        
                     }
-            }else
-                printf("\n<SERVER> MAX USERS REACHED!\n");
-            
+
+                    close(fr);
+
+                }else if(validation == 0){ //password or username invalid
+
+                    sprintf(fifo_cli,FIFO_CLI,api.pid);
+                    int fr = open(fifo_cli,O_WRONLY);
+
+                    if(fr == -1){
+
+                        printf(FILE_ERROR);
+
+                    }else{
+
+                        for(i = 0; i < strlen(api.login.username);i++)
+                            userData.name[i] = api.login.username[i];
+                        
+                        userData.name[i] = '\0';
+
+                        userData.money = 0;
+                        userData.status = -1;
+
+                        nBytes = write(fr,&userData,sizeof(user));
+
+                    }
+
+                    close(fr);
+
+                }else{
+                    printf("ERROR USING (USERS) LIBRARY!");
+                    unlink(FIFO_SRV);
+                    exit(1);
+                }
+
+            }else if(api.status == COMMAND_INFO){
+
+                printf("<SERVER> COMMAND RECIVED!");
+
+            }
 
         }else{
             printf("\nSELECT ERROR!\n");

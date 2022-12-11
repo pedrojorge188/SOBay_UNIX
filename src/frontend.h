@@ -24,7 +24,6 @@ char SPACE[] = {" "};
 int WRONG = 0;
 
 int setup_command(char *command);
-int connect_server(tryLogin login,user MyAccount,char **argv);
 
 #endif
 

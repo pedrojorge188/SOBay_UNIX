@@ -14,10 +14,12 @@
 
 //Const's Fifos (Pipes)
 #define FIFO_CLI "./tmp/cli_%d"
-#define FIFO_SRV "./tmp/fifo_login"
+#define FIFO_SRV "./tmp/server_api"
 #define USER_NOT_FOUND -1
 #define USER_LOGIN_SUCCESS 1
 #define CONNECT_TRUE 1
+#define COMMAND_INFO 1
+#define LOGIN_INFO 2
 
 //Globals
 #define MAX_USERS 20
@@ -26,15 +28,34 @@ int CONNECTED_USERS = 0;
 int server_pid = 0;
 
 typedef struct{
+    int duration;
+    int category;
+    int promotion;
+}promoter_info;
+
+typedef struct{
+    char name [15];
+    char full_cmd [50];
+}command_info;
+
+
+typedef struct{
     char name [50];
     int money;
     int status;
 }user;
 
 typedef struct{
-    int my_pid;
     char username [50];
     char psw [50];
 }tryLogin;
+
+typedef struct{
+    int status; //1-command 2-login
+    int pid;
+    tryLogin login;
+    command_info cmd;
+
+}notification;
 
 #endif
