@@ -34,8 +34,7 @@ typedef struct{
 }promoter_info;
 
 typedef struct{
-    char name [15];
-    char full_cmd [50];
+    char command[50];
 }command_info;
 
 

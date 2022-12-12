@@ -42,14 +42,10 @@ int main(int argc, char **argv) {
 
         api.status = LOGIN_INFO;
         api.pid = getpid();
+        
+        strcpy(api.login.username,argv[1]);
 
-        for(i = 0; i < strlen(argv[1]);i++){
-            api.login.username[i] = argv[1][i];
-        }
-
-        for(i = 0; i < strlen(argv[2]);i++){
-            api.login.psw[i] = argv[2][i];
-        }
+        strcpy(api.login.psw,argv[2]);
 
 
         sprintf(fifo_cli,FIFO_CLI,api.pid);
@@ -126,12 +122,27 @@ int main(int argc, char **argv) {
 
         if(res > 0 && FD_ISSET(0,&fds)){
 
+            char a_command[MSG_TAM];
+
             fgets(command,MSG_TAM-1,stdin);
             command[strlen(command)-1] = '\0';
-            
-            if (setup_command(command) == 0)
+            strcpy(a_command,command);
+
+            if (setup_command(command) == 0){
+
                 printf(WRONG_COMMAND,command);
 
+            }else{
+
+                api.status = COMMAND_INFO;
+                api.pid = getpid();
+
+                strcpy(api.cmd.command,a_command);
+
+                printf("<%s> COMMAND EXECUTED!\n",MyAccount.name);
+                write(fs,&api,sizeof(notification));
+
+            }
         }
 
         WRONG = 0;
@@ -272,8 +283,6 @@ int setup_command(char *command){
                 printf(WRONG_COMMAND, strtok(command, SPACE));
             return 0;
     }else{
-        //end to backend the command
-        printf("Executing command...\n");
         return 1;
     }
 

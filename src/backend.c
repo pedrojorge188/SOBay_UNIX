@@ -186,7 +186,7 @@ int main(int argc, char *argv[], char **envp)
 
             }else if(api.status == COMMAND_INFO){
 
-                printf("<SERVER> COMMAND RECIVED!");
+                printf("<SERVER>COMMAND from %d (%s)\n",api.pid,api.cmd.command);
 
             }
 
