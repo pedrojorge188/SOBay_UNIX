@@ -23,6 +23,7 @@ void backend_sigs(int sig){
 int main(int argc, char **argv) {
     
     notification api;
+    info api_recive;
     fd_set fds;
     user MyAccount;
 
@@ -106,18 +107,18 @@ int main(int argc, char **argv) {
         signal(SIGINT,handle_quit);
         signal(SIGQUIT,backend_sigs);
 
-        fs = open(FIFO_SRV,O_RDWR);
+        fc = open(fifo_cli,O_RDWR);
 
-        if(fs == -1){
+        if(fc == -1){
             printf("ERROR TO OPEN SERVER PIPE");
             exit(EXIT_FAILURE);
         }
 
         FD_ZERO(&fds); //reset fds pointer 
         FD_SET(0,&fds);  //define input as stdin
-        FD_SET(fs,&fds); //define pipe input (in this case we'r refering to fd)
+        FD_SET(fc,&fds); //define pipe input (in this case we'r refering to fd)
 
-        int res = select(fs+1,&fds,NULL,NULL,NULL);
+        int res = select(fc+1,&fds,NULL,NULL,NULL);
 
 
         if(res > 0 && FD_ISSET(0,&fds)){
@@ -126,6 +127,7 @@ int main(int argc, char **argv) {
 
             fgets(command,MSG_TAM-1,stdin);
             command[strlen(command)-1] = '\0';
+
             strcpy(a_command,command);
 
             if (setup_command(command) == 0){
@@ -138,16 +140,40 @@ int main(int argc, char **argv) {
                 api.pid = getpid();
 
                 strcpy(api.cmd.command,a_command);
+                strcpy(api.cmd.name,command);
 
                 printf("<%s> COMMAND EXECUTED!\n",MyAccount.name);
+
+                fs = open(FIFO_SRV,O_WRONLY);
+
+                if(fs == -1){
+                    printf("ERROR TO OPEN SERVER PIPE");
+                    exit(EXIT_FAILURE);
+                }
+                
                 write(fs,&api,sizeof(notification));
+
+                close(fs);
+            }
+
+        }else if(res > 0 && FD_ISSET(fc,&fds)){
+
+            nBytes = read(fc,&api_recive,sizeof(info));
+
+            if(api_recive.status == 3){
+                
+                printf("%s\n",api_recive.message);
+
+            }else if(api_recive.status == ITEM_INFO){
+
+                printf("%s\n",api_recive.message);
 
             }
         }
 
         WRONG = 0;
         setbuf(stdin,NULL);
-        close(fs);
+        close(fc);
 
     }while(strcmp(command,"exit") != 0);
 

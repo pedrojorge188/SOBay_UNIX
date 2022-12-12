@@ -19,6 +19,7 @@ int main(int argc, char *argv[], char **envp)
     
     items itemsList[MAX_ITEMS];
     notification api;
+    info api_return;
     user userData;
     fd_set fds;
     client users[MAX_USERS];
@@ -85,7 +86,10 @@ int main(int argc, char *argv[], char **envp)
                 
         }else if(res > 0 && FD_ISSET(fd,&fds)){
 
-             nBytes = read(fd,&api,sizeof(notification));
+            nBytes = read(fd,&api,sizeof(notification));
+
+            sprintf(fifo_cli,FIFO_CLI,api.pid);
+
 
             if(api.status == LOGIN_INFO){
                 
@@ -103,8 +107,6 @@ int main(int argc, char *argv[], char **envp)
 
                 if(validation == 1 ){ //password or username correct
                     
-                    sprintf(fifo_cli,FIFO_CLI,api.pid);
-
                     int fr = open(fifo_cli,O_WRONLY);
 
                     if(fr == -1){
@@ -186,7 +188,66 @@ int main(int argc, char *argv[], char **envp)
 
             }else if(api.status == COMMAND_INFO){
 
-                printf("<SERVER>COMMAND from %d (%s)\n",api.pid,api.cmd.command);
+                int fr = open(fifo_cli,O_WRONLY);
+
+
+                if(strcmp(api.cmd.name,"sell") == 0){
+                    
+                    api_return.status = INFO;
+                    strcpy(api_return.message,"<SERVER>SELL EXECUTED!");
+                    write(fr,&api_return,sizeof(info));
+
+                }else if(strcmp(api.cmd.name,"licat") == 0){
+
+                    api_return.status = ITEM_INFO;
+                    strcpy(api_return.message,"<SERVER>LICAT EXECUTED!");
+                    write(fr,&api_return,sizeof(info));
+
+                }else if(strcmp(api.cmd.name,"lisel") == 0){
+
+                    api_return.status = ITEM_INFO;
+                    strcpy(api_return.message,"<SERVER>LISEL EXECUTED!");
+                    write(fr,&api_return,sizeof(info));
+
+                }else if(strcmp(api.cmd.name,"lival") == 0){
+
+                    api_return.status = ITEM_INFO;
+                    strcpy(api_return.message,"<SERVER>LIVAL EXECUTED!");
+                    write(fr,&api_return,sizeof(info));
+
+                }else if(strcmp(api.cmd.name,"litime") == 0){
+
+                    api_return.status = ITEM_INFO;
+                    strcpy(api_return.message,"<SERVER>LITIME EXECUTED!");
+                    write(fr,&api_return,sizeof(info));
+
+                }else if(strcmp(api.cmd.name,"time") == 0){
+
+                    api_return.status = INFO;
+                    strcpy(api_return.message,"<SERVER>TIME EXECUTED!");
+                    write(fr,&api_return,sizeof(info));
+
+                }else if(strcmp(api.cmd.name,"buy") == 0){
+
+                    api_return.status = INFO;
+                    strcpy(api_return.message,"<SERVER>BUY EXECUTED!");
+                    write(fr,&api_return,sizeof(info));
+
+                }else if(strcmp(api.cmd.name,"cash")== 0) {
+
+                    api_return.status = INFO;
+                    strcpy(api_return.message,"<SERVER>CASH EXECUTED!");
+                    write(fr,&api_return,sizeof(info));
+
+                }else if(strcmp(api.cmd.name,"add") == 0 ){
+
+                    api_return.status = INFO;
+                    strcpy(api_return.message,"<SERVER>ADD EXECUTED!");
+                    write(fr,&api_return,sizeof(info));
+
+                }   
+
+                close(fr);
 
             }
 
