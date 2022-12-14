@@ -14,7 +14,7 @@ void handle_quit(int sig){
 
 int main(int argc, char *argv[], char **envp)
 {   
-    int res,nBytes,fd;
+    int res,nBytes,fd,nItems;
     char command[MSG_TAM],fifo_cli[50];
     
     items itemsList[MAX_ITEMS];
@@ -24,8 +24,10 @@ int main(int argc, char *argv[], char **envp)
     fd_set fds;
     client users[MAX_USERS];
     
+    //initialize defaults
     init_env_var();
     fill_users((client *)&users);
+    nItems = load_items((items *)&itemsList);
 
     setbuf(stdout,NULL);
 
@@ -39,7 +41,6 @@ int main(int argc, char *argv[], char **envp)
     }
 
     do{
-
         signal(SIGINT,handle_quit);
 
         fd = open(FIFO_SRV,O_RDWR);
@@ -75,7 +76,7 @@ int main(int argc, char *argv[], char **envp)
                         list_users((client *)&users);
                     
                     if(strcmp(command,"list") == 0)
-                        load_items((items *)&itemsList);
+                        list_items((items *)&itemsList,nItems);
 
 
                     if(strcmp(command,"kick") == 0)
@@ -284,16 +285,14 @@ int load_items(items *itemsList){
 
     int item = 0;
 
-    printf("\n<SERVER>ITEMS!\n");
     while(fgets(itemBuffer,sizeof(itemBuffer),fItems)){
-
-        printf("%s",itemBuffer);
+        
         token = strtok(itemBuffer,SPACE);
         itemsList[item].id = atoi(token); // id
         token = strtok(NULL,SPACE);
-        itemsList[item].name = token; // nome do item
+        strcpy(itemsList[item].name,token); // nome do item
         token = strtok(NULL,SPACE);
-        itemsList[item].category = token; // categoria do item
+        strcpy(itemsList[item].category,token); // categoria do item
         token = strtok(NULL,SPACE);
         itemsList[item].current_price = atoi(token); // valor inicial/licitacao mais elevada
         token = strtok(NULL,SPACE);
@@ -301,9 +300,11 @@ int load_items(items *itemsList){
         token = strtok(NULL,SPACE);
         itemsList[item].time_left = atoi(token); //duração/tempo restante do leilao
         token = strtok(NULL,SPACE);
-        itemsList[item].username_owner = token; // username do vendedor
+        strcpy(itemsList[item].username_owner,token); // username do vendedor
         token = strtok(NULL,"\n");
-        itemsList[item].username_best_option = token; //username da melhor opcao de comprador
+        strcpy(itemsList[item].username_best_option,token); //username da melhor opcao de comprador
+
+        itemsList[item].sell_state = false;
 
         item++;
 
@@ -313,7 +314,24 @@ int load_items(items *itemsList){
 
     fclose(fItems);
 
-    return 1;
+    return item;
+}
+
+void list_items(items *itemsList,int nItems){
+
+    printf("<SERVER>%d ITEMS\n",nItems);
+
+    for(int i=0;i<nItems;i++){
+
+        printf("ID: %d ",itemsList[i].id);
+        printf("NAME: %s ",itemsList[i].name);
+        printf("CATEGORY: %s ",itemsList[i].category);
+        printf("PRICE: %d ",itemsList[i].current_price);
+        printf("CURRENT PRICE: %d ",itemsList[i].buy_now_price);
+        printf("TIME LEFT: %d ",itemsList[i].time_left);
+        printf("OWNER: %s ",itemsList[i].username_owner);
+        printf("BEST OFFER: %s \n",itemsList[i].username_best_option);
+    }
 }
 
 int getPromoters(){
@@ -521,6 +539,7 @@ void kick_user(char *username,client *users){
     }
 
 }
+
 int get_ind(client *users){
 
     for(int i=0;i < MAX_USERS;i++){
@@ -543,6 +562,7 @@ void fill_users(client *users){
 
     }
 }
+
 
 void init_env_var(){
     setenv("FPROMOTERS", "promo.txt", 0);

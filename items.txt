@@ -1,4 +1,6 @@
-1 cocacola bebidas 10 15 20 pedro antonio
-2 tapete casa 12 18 10 rodrigo antonio
-3 quadro casa 40 70 11 pedro antonio
-4 quadro casa 40 70 11 pedro antonio
+1 icetea bebidas 10 15 100 pedro antonio 
+2 camisa roupa 12 18 100 rodrigo antonio 
+3 cozinha casa 40 30 100 pedro antonio 
+4 casaco roupa 80 110 100 pedro antonio 
+5 meias roupa 49 70 100 pedro antonio 
+6 teste teste 20 20 20 teste teste

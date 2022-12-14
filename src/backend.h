@@ -32,6 +32,7 @@
 char *LIST[] = {"users", "list", "kick", "prom", "reprom", "cancel", "close"};
 int LIST_INDEX[] = {0, 0, 1, 0, 0, 1, 0};
 char SPACE[] = {" "};
+
 int WRONG = 0;
 
 
@@ -50,10 +51,10 @@ typedef struct client{
 
 typedef struct items{
     int id;
-    char *name;
-    char *category;
-    char *username_owner;
-    char *username_best_option;
+    char name[20];
+    char category[20];
+    char username_owner[20];
+    char username_best_option[20];
     int buy_now_price;
     int current_price;
     bool sell_state;
@@ -73,6 +74,7 @@ void init_env_var();
 void list_users(client *users);
 void list_items_to_sell(items *itemsList);
 int load_items(items *itemsList);
+void list_items(items *itemsList,int nItems);
 void disconnect_users();
 void kick_user(char *username,client *users);
 void fill_users(client *users);
