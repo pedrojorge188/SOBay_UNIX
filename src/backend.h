@@ -32,10 +32,16 @@
 char *LIST[] = {"users", "list", "kick", "prom", "reprom", "cancel", "close"};
 int LIST_INDEX[] = {0, 0, 1, 0, 0, 1, 0};
 char SPACE[] = {" "};
+<<<<<<< Updated upstream
 
 int WRONG = 0;
 int out = 0;
 
+=======
+
+int WRONG = 0;
+
+>>>>>>> Stashed changes
 /*Reading Defauls*/
 int pidUsers[RANGE];
 char *namePromoters[NPROMOTERS];

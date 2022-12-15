@@ -33,6 +33,10 @@
 int CONNECTED_USERS = 0;
 int helper = 0;
 int TIME = 0;
+<<<<<<< Updated upstream
+=======
+int out = 0;
+>>>>>>> Stashed changes
 
 typedef struct{
     int id;
