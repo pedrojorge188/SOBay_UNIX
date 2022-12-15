@@ -6,11 +6,11 @@ all:backend frontend
 	@echo "Successful complilation!"
 
 backend: ${path}/backend.c  ${path}/backend.h ${path}/utils.h
-	${cc} ${path}/backend.c  -o backend users_lib.o
+	${cc} ${path}/backend.c  -o backend users_lib.o -lpthread
 	@echo "Successful complilation of backend!"
 
 frontend: ${path}/frontend.c   ${path}/frontend.h ${path}/utils.h
-	${cc} ${path}/frontend.c  -o frontend
+	${cc} ${path}/frontend.c  -o frontend -lpthread
 	@echo "Successful complilation of frontend!"
 
 clean:

@@ -34,7 +34,7 @@ int LIST_INDEX[] = {0, 0, 1, 0, 0, 1, 0};
 char SPACE[] = {" "};
 
 int WRONG = 0;
-
+int out = 0;
 
 /*Reading Defauls*/
 int pidUsers[RANGE];

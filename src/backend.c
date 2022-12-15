@@ -1,15 +1,38 @@
 #include "backend.h"
 extern char **environ;
- 
+
+void signal_handler(int sig){}
+
 void handle_quit(int sig){
 
     unlink(FIFO_SRV);
     
     puts("\n<SERVER> CLOSING ...");
 
+    out = 1;
+
     disconnect_users();
 
     exit(1);
+}
+
+static void* checkLife(void* data){
+    while(out == 0){
+        sleep(1);
+        TIME++;
+    }
+
+    pthread_exit(NULL);
+
+}
+
+static void* Timer(void *data){
+    while(out == 0){
+        sleep(1);
+        TIME++;
+    }
+
+    pthread_exit(NULL);
 }
 
 int main(int argc, char *argv[], char **envp)
@@ -23,8 +46,14 @@ int main(int argc, char *argv[], char **envp)
     user userData;
     fd_set fds;
     client users[MAX_USERS];
-    
-    //initialize defaults
+
+    pthread_t threadId[N_THREADS];
+
+    struct sigaction sa;
+    sa.sa_handler = signal_handler;
+    sigaction(SIGINT,&sa,NULL);
+    sigaction(SIGUSR1,&sa,NULL);
+
     init_env_var();
     fill_users((client *)&users);
     nItems = load_items((items *)&itemsList);
@@ -39,6 +68,13 @@ int main(int argc, char *argv[], char **envp)
         printf("Backend already in use!\n");
         exit(EXIT_FAILURE);
     }
+
+    if(pthread_create(&threadId[0],NULL,Timer,0) !=0 )
+        printf("Error on timer thread creation\n");
+
+    if(pthread_create(&threadId[1],NULL,checkLife,0) != 0)
+        printf("Error on checkLige thread creation\n");
+    
 
     do{
         signal(SIGINT,handle_quit);
@@ -246,7 +282,13 @@ int main(int argc, char *argv[], char **envp)
                     strcpy(api_return.message,"<SERVER>ADD EXECUTED!");
                     write(fr,&api_return,sizeof(info));
 
-                }   
+                }else if(strcmp(api.cmd.name,"list") == 0){
+
+                    api_return.status = ITEM_INFO;
+                    strcpy(api_return.message,"<SERVER>list EXECUTED!");
+                    write(fr,&api_return,sizeof(info));
+
+                }
 
                 close(fr);
 
@@ -262,6 +304,16 @@ int main(int argc, char *argv[], char **envp)
         close(fd);
 
     }while(command != "close");
+     
+    out = 1;
+
+    for(int i=0;i<N_THREADS;i++)
+        pthread_kill(threadId[i],SIGUSR1);
+    
+
+    for(int i=0;i<N_THREADS;i++)
+        pthread_join(threadId[i],NULL);
+    
 
     unlink(FIFO_SRV);
 

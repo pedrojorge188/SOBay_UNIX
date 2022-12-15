@@ -11,6 +11,7 @@
 #include<sys/stat.h>
 #include<fcntl.h>
 #include<sys/select.h>
+#include <pthread.h>
 
 //Const's Fifos (Pipes)
 #define FIFO_CLI "./tmp/cli_%d"
@@ -23,13 +24,15 @@
 #define ITEM_INFO 1
 #define PROMOTOR_INFO 2
 #define LOGIN_INFO 2
-#define INFO 3;
+#define INFO 3
+#define N_THREADS 2
 
 //Globals
 #define MAX_USERS 20
 
 int CONNECTED_USERS = 0;
 int helper = 0;
+int TIME = 0;
 
 typedef struct{
     int id;
