@@ -16,11 +16,41 @@ void handle_quit(int sig){
     exit(1);
 }
 
+static void* timeKill(void* data){
+    client *args = (client *)data;
+
+    int timeKill = 0; 
+
+    while(out == 0){
+
+        if(timeKill == 0){
+            timeKill = TIME + 5;
+        }
+
+        if(TIME == timeKill){
+            for(int i = 0; i < MAX_USERS; i++){
+                if(args[i].signal == 0){
+                    args[i].connection = false;
+                    //printf("PID tirado -> %d\n", args[i].pid);
+                }
+            }
+
+            for(int i = 0; i< MAX_USERS; i++){
+                args[i].signal = 0;
+            }
+
+            timeKill = TIME + 5;
+        }
+    }
+
+    pthread_exit(NULL);
+}
+
 static void* checkLife(void* data){
 
     args_thread *args = (args_thread *)data;
 
-    int pid;
+    int pid = 0;
     int fd = open(args->fifo_name,O_RDWR);
 
     if(fd == -1) {
@@ -33,7 +63,13 @@ static void* checkLife(void* data){
 
         read(fd,&pid,sizeof(int));
 
-        
+        for(int i = 0; i< MAX_USERS; i++){
+            if(args->users[i].pid == pid){
+                //printf("signalOFF -> %d\n", args->users[i].signal);
+                args->users[i].signal = 1;
+                //printf("signalON -> %d\n", args->users[i].signal);
+            }
+        }
     }
 
     pthread_exit(NULL);
@@ -96,8 +132,10 @@ int main(int argc, char *argv[], char **envp)
 
 
     if(pthread_create(&threadId[1],NULL,checkLife,(void *)&args) != 0)
-        printf("Error on checkLige thread creation\n");
-    
+        printf("Error on checkLife thread creation\n");
+
+    if(pthread_create(&threadId[2],NULL,timeKill,(void *)&users) != 0)
+        printf("Error on timeKill thread creation\n");
 
     do{
         signal(SIGINT,handle_quit);
@@ -636,6 +674,7 @@ void fill_users(client *users){
         users[i].pid = 0;
         users[i].connection = false;
         users[i].balance = 0;
+        users[i].signal = 0;
     }
 }
 

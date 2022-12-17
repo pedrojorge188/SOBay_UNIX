@@ -44,6 +44,7 @@ typedef struct client{
     int pid;
     char name[50];
     int balance;
+    int signal;
     bool connection;
 }client;
 

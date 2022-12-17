@@ -26,10 +26,10 @@
 #define PROMOTOR_INFO 2
 #define LOGIN_INFO 2
 #define INFO 3
-#define N_THREADS 2
+#define N_THREADS 3
 
 //Globals
-#define MAX_USERS 20
+#define MAX_USERS 2
 
 int CONNECTED_USERS = 0;
 int helper = 0;
