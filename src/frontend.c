@@ -1,8 +1,6 @@
 
 #include "frontend.h"
 
-<<<<<<< Updated upstream
-=======
 static void* sendLife(void* data){
     int myPid = getpid();
 
@@ -17,13 +15,12 @@ static void* sendLife(void* data){
     while(out == 0){
 
         write(fd,&myPid,sizeof(int));
-        sleep(5);
+        sleep(1);
     }
 
     pthread_exit(NULL);
 }
 
->>>>>>> Stashed changes
 void handle_quit(int sig){
 
     char fifo_cli[50];
@@ -49,6 +46,8 @@ int main(int argc, char **argv) {
     info api_recive;
     fd_set fds;
     user MyAccount;
+
+    pthread_t threads;
 
     int fc,fs,nBytes,i;
     char command[MSG_TAM];
@@ -125,14 +124,10 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
    
-<<<<<<< Updated upstream
-    
-=======
     if(pthread_create(&threads,NULL,sendLife,0) != 0)
         printf("ERROR ON SENDLIFE THREAD CREATION\n");
 
 
->>>>>>> Stashed changes
     do{
         signal(SIGINT,handle_quit);
         signal(SIGQUIT,backend_sigs);
@@ -207,13 +202,10 @@ int main(int argc, char **argv) {
 
     }while(strcmp(command,"exit") != 0);
 
-<<<<<<< Updated upstream
-=======
     out = 1;
 
     pthread_join(threads,NULL);
 
->>>>>>> Stashed changes
     unlink(fifo_cli);
 
     return 0;

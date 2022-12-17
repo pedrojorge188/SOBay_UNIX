@@ -4,21 +4,6 @@ extern char **environ;
 void signal_handler(int sig){}
 
 void handle_quit(int sig){
-<<<<<<< Updated upstream
-
-    unlink(FIFO_SRV);
-    
-    puts("\n<SERVER> CLOSING ...");
-
-    out = 1;
-
-    disconnect_users();
-
-    exit(1);
-}
-
-static void* checkLife(void* data){
-=======
 
     unlink(FIFO_SRV);
     unlink(FIFO_BEAT);
@@ -33,35 +18,25 @@ static void* checkLife(void* data){
 
 static void* checkLife(void* data){
 
-    char *c = (char *)data;
-    int pid;
+    args_thread *args = (args_thread *)data;
 
-    int fd = open(c,O_RDWR);
-    
+    int pid;
+    int fd = open(args->fifo_name,O_RDWR);
+
     if(fd == -1) {
         printf("Error on fifo opening");
-        unlink(c);
+        unlink(args->fifo_name);
         exit(1);
     }
 
     while(out == 0){
+
         read(fd,&pid,sizeof(int));
-        printf("%d\n",pid);
+
+        
     }
 
     pthread_exit(NULL);
-
-}
-
-static void* Timer(void *data){
->>>>>>> Stashed changes
-    while(out == 0){
-        sleep(1);
-        TIME++;
-    }
-
-    pthread_exit(NULL);
-<<<<<<< Updated upstream
 
 }
 
@@ -72,8 +47,6 @@ static void* Timer(void *data){
     }
 
     pthread_exit(NULL);
-=======
->>>>>>> Stashed changes
 }
 
 int main(int argc, char *argv[], char **envp)
@@ -87,7 +60,8 @@ int main(int argc, char *argv[], char **envp)
     user userData;
     fd_set fds;
     client users[MAX_USERS];
-
+    
+    args_thread args;
     pthread_t threadId[N_THREADS];
 
     struct sigaction sa;
@@ -110,12 +84,6 @@ int main(int argc, char *argv[], char **envp)
         exit(EXIT_FAILURE);
     }
 
-<<<<<<< Updated upstream
-    if(pthread_create(&threadId[0],NULL,Timer,0) !=0 )
-        printf("Error on timer thread creation\n");
-
-    if(pthread_create(&threadId[1],NULL,checkLife,0) != 0)
-=======
     if(access(FIFO_BEAT,F_OK) != 0)
         mkfifo(FIFO_BEAT,0666);
     
@@ -123,8 +91,11 @@ int main(int argc, char *argv[], char **envp)
     if(pthread_create(&threadId[0],NULL,Timer,0) !=0 )
         printf("Error on timer thread creation\n");
 
-    if(pthread_create(&threadId[1],NULL,checkLife,FIFO_BEAT) != 0)
->>>>>>> Stashed changes
+    args.users = users;
+    strcpy(args.fifo_name,FIFO_BEAT);
+
+
+    if(pthread_create(&threadId[1],NULL,checkLife,(void *)&args) != 0)
         printf("Error on checkLige thread creation\n");
     
 
@@ -473,6 +444,7 @@ void list_users(client *users){
         for(int i=0;i<MAX_USERS;i++){
 
             if(users[i].connection == true){
+
                 printf("PID:%d\t",users[i].pid);
                 printf("NAME:%s\t",users[i].name);
                 printf("BALANCE:%d\n",users[i].balance);
@@ -664,7 +636,6 @@ void fill_users(client *users){
         users[i].pid = 0;
         users[i].connection = false;
         users[i].balance = 0;
-
     }
 }
 
