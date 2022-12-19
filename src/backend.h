@@ -83,6 +83,8 @@ void list_items(items *itemsList,int nItems);
 void disconnect_users();
 void kick_user(char *username,client *users);
 void fill_users(client *users);
+void fill_items(items *items);
 int get_ind(client *users);
+int get_ind_items(items *items);
 
 #endif

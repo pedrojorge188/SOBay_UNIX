@@ -2,6 +2,9 @@
 #include "frontend.h"
 
 static void* sendLife(void* data){
+
+    char *heartbeat = getenv("HEARTBEAT");
+
     int myPid = getpid();
 
     int fd = open(FIFO_BEAT,O_RDWR);
@@ -15,7 +18,7 @@ static void* sendLife(void* data){
     while(out == 0){
 
         write(fd,&myPid,sizeof(int));
-        sleep(1);
+        sleep(atoi(heartbeat));
     }
 
     pthread_exit(NULL);
@@ -42,6 +45,8 @@ void backend_sigs(int sig){
 
 int main(int argc, char **argv) {
     
+    setenv("HEARTBEAT","5", 0);
+
     notification api;
     info api_recive;
     fd_set fds;
@@ -166,8 +171,6 @@ int main(int argc, char **argv) {
 
                 strcpy(api.cmd.command,a_command);
                 strcpy(api.cmd.name,command);
-
-                printf("<%s> COMMAND EXECUTED!\n",MyAccount.name);
 
                 fs = open(FIFO_SRV,O_WRONLY);
 

@@ -29,7 +29,7 @@
 #define N_THREADS 3
 
 //Globals
-#define MAX_USERS 2
+#define MAX_USERS 20
 
 int CONNECTED_USERS = 0;
 int helper = 0;
@@ -38,10 +38,10 @@ int out = 0;
 
 typedef struct{
     int id;
-    char *name;
-    char *category;
-    char *username_owner;
-    char *username_best_option;
+    char name[20];
+    char category[20];
+    char username_owner[20];
+    char username_best_option[20];
     int buy_now_price;
     int current_price;
     bool sell_state;

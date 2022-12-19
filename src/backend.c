@@ -31,7 +31,6 @@ static void* timeKill(void* data){
             for(int i = 0; i < MAX_USERS; i++){
                 if(args[i].signal == 0){
                     args[i].connection = false;
-                    //printf("PID tirado -> %d\n", args[i].pid);
                 }
             }
 
@@ -54,7 +53,6 @@ static void* checkLife(void* data){
     int fd = open(args->fifo_name,O_RDWR);
 
     if(fd == -1) {
-        printf("Error on fifo opening");
         unlink(args->fifo_name);
         exit(1);
     }
@@ -65,9 +63,7 @@ static void* checkLife(void* data){
 
         for(int i = 0; i< MAX_USERS; i++){
             if(args->users[i].pid == pid){
-                //printf("signalOFF -> %d\n", args->users[i].signal);
                 args->users[i].signal = 1;
-                //printf("signalON -> %d\n", args->users[i].signal);
             }
         }
     }
@@ -86,7 +82,9 @@ static void* Timer(void *data){
 }
 
 int main(int argc, char *argv[], char **envp)
-{   
+{      
+    init_env_var();
+
     int res,nBytes,fd,nItems;
     char command[MSG_TAM],fifo_cli[50];
     
@@ -105,8 +103,9 @@ int main(int argc, char *argv[], char **envp)
     sigaction(SIGINT,&sa,NULL);
     sigaction(SIGUSR1,&sa,NULL);
 
-    init_env_var();
     fill_users((client *)&users);
+    fill_items((items *)&itemsList);
+    
     nItems = load_items((items *)&itemsList);
 
     setbuf(stdout,NULL);
@@ -418,7 +417,7 @@ int load_items(items *itemsList){
         token = strtok(NULL,"\n");
         strcpy(itemsList[item].username_best_option,token); //username da melhor opcao de comprador
 
-        itemsList[item].sell_state = false;
+        itemsList[item].sell_state = true;
 
         item++;
 
@@ -435,16 +434,20 @@ void list_items(items *itemsList,int nItems){
 
     printf("<SERVER>%d ITEMS\n",nItems);
 
-    for(int i=0;i<nItems;i++){
+    for(int i=0;i<MAX_ITEMS;i++){
 
-        printf("ID: %d ",itemsList[i].id);
-        printf("NAME: %s ",itemsList[i].name);
-        printf("CATEGORY: %s ",itemsList[i].category);
-        printf("PRICE: %d ",itemsList[i].current_price);
-        printf("CURRENT PRICE: %d ",itemsList[i].buy_now_price);
-        printf("TIME LEFT: %d ",itemsList[i].time_left);
-        printf("OWNER: %s ",itemsList[i].username_owner);
-        printf("BEST OFFER: %s \n",itemsList[i].username_best_option);
+        if(itemsList[i].sell_state == true){
+
+            printf("ID: %d ",itemsList[i].id);
+            printf("NAME: %s ",itemsList[i].name);
+            printf("CAT: %s ",itemsList[i].category);
+            printf("PRICE: %d ",itemsList[i].current_price);
+            printf("CURRENT PRICE: %d ",itemsList[i].buy_now_price);
+            printf("TIME LEFT: %d ",itemsList[i].time_left);
+            printf("OWNER: %s ",itemsList[i].username_owner);
+            printf("BEST OFFER: %s \n",itemsList[i].username_best_option);
+
+        }
     }
 }
 
@@ -663,6 +666,31 @@ int get_ind(client *users){
     }
 
     return -1;
+}
+
+int get_ind_items(items *items){
+
+    for(int i=0;i < MAX_ITEMS;i++){
+        if(items[i].sell_state == false)
+            return i;    
+    }
+
+    return -1;
+}
+
+void fill_items(items *items){
+
+    for(int i = 0;i<MAX_ITEMS;i++){
+        items[i].id = 0;
+        items[i].name[0] = 'd';
+        items[i].buy_now_price = 0;
+        items[i].category[0] = 'd';
+        items[i].current_price = 0;
+        items[i].time_left = 0;
+        items[i].username_owner[0] = 'd';
+        items[i].username_best_option[0] = 'd';
+        items[i].sell_state = false;
+    }
 }
 
 void fill_users(client *users){
