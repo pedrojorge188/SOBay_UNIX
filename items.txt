@@ -4,3 +4,4 @@
 4 casaco roupa 80 110 100 pedro antonio 
 5 meias roupa 49 70 100 pedro antonio 
 6 teste teste 20 20 20 teste teste
+7 banana fruta 5 16 190 gustavo none

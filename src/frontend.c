@@ -188,13 +188,28 @@ int main(int argc, char **argv) {
 
             nBytes = read(fc,&api_recive,sizeof(info));
 
-            if(api_recive.status == 3){
+            if(api_recive.status == INFO){
                 
                 printf("%s\n",api_recive.message);
 
             }else if(api_recive.status == ITEM_INFO){
 
                 printf("%s\n",api_recive.message);
+
+                for(int i=0;i<MAX_ITEMS;i++){
+
+                    if(api_recive.items[i].sell_state == true){
+
+                        printf("ID: %d ",api_recive.items[i].id);
+                        printf("NAME: %s ",api_recive.items[i].name);
+                        printf("CAT: %s ",api_recive.items[i].category);
+                        printf("PRICE: %d ",api_recive.items[i].current_price);
+                        printf("CURRENT PRICE: %d ",api_recive.items[i].buy_now_price);
+                        printf("TIME LEFT: %d ",api_recive.items[i].time_left);
+                        printf("OWNER: %s ",api_recive.items[i].username_owner);
+                        printf("BEST OFFER: %s \n",api_recive.items[i].username_best_option);
+                    }
+                }
 
             }
         }

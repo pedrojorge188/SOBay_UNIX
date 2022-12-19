@@ -27,16 +27,20 @@
 #define LOGIN_INFO 2
 #define INFO 3
 #define N_THREADS 3
+#define ALL_ITEMS_INFO "<SERVER>All Items!"
+#define NONE_ITEMS "<SERVER>ANY ITEMS TO LIST!\n"
+#define TIME_INFO "<SERVER>TIME!"
 
 //Globals
 #define MAX_USERS 20
+#define MAX_ITEMS 30
 
 int CONNECTED_USERS = 0;
 int helper = 0;
 int TIME = 0;
 int out = 0;
 
-typedef struct{
+typedef struct items{
     int id;
     char name[20];
     char category[20];
@@ -46,7 +50,7 @@ typedef struct{
     int current_price;
     bool sell_state;
     int time_left;
-}item_list;
+}items;
 
 typedef struct{
     int duration;
@@ -87,7 +91,7 @@ typedef struct{
 
     int status; //1 - itemInformation 2-promotor_info 3-other
     char message[50]; 
-    item_list items;
+    items items[MAX_ITEMS];
     promoter_info promo;
 
 }info;

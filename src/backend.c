@@ -284,6 +284,8 @@ int main(int argc, char *argv[], char **envp)
                 }
 
             }else if(api.status == COMMAND_INFO){
+                
+                fill_items((struct items*)&api_return.items);
 
                 int fr = open(fifo_cli,O_WRONLY);
 
@@ -296,33 +298,108 @@ int main(int argc, char *argv[], char **envp)
                     write(fr,&api_return,sizeof(info));
 
                 }else if(strcmp(api.cmd.name,"licat") == 0){
+                    
+                    char category[20] ;
+                    int counter = 0;
+                    strcpy(category,api.cmd.command+6);
 
                     api_return.status = ITEM_INFO;
-                    strcpy(api_return.message,"<SERVER>LICAT EXECUTED!");
+                    strcpy(api_return.message,"<SERVER>ITEMS OF CATEGORY!");
+                    
+                     for(int i=0;i<MAX_ITEMS;i++){
+            
+                        if(strcmp(itemsList[i].category,category) == 0){
+                            api_return.items[i] = itemsList[i];
+                            counter++;
+                        }
+                     }
+
+                     if(counter == 0)
+                         strcpy(api_return.message,NONE_ITEMS);
+
                     write(fr,&api_return,sizeof(info));
 
                 }else if(strcmp(api.cmd.name,"lisel") == 0){
 
+                    char name_owner[20] ;
+                    int counter = 0;
+                    strcpy(name_owner,api.cmd.command+6);
+
                     api_return.status = ITEM_INFO;
-                    strcpy(api_return.message,"<SERVER>LISEL EXECUTED!");
+                    strcpy(api_return.message,"<SERVER>ITEMS (username)!");
+
+                    for(int i=0;i<MAX_ITEMS;i++){
+            
+                        if(strcmp(itemsList[i].username_owner,name_owner) == 0){
+                            api_return.items[i] = itemsList[i];
+                            counter ++;
+                        }
+                        
+                    }
+
+                    if(counter == 0)
+                         strcpy(api_return.message,NONE_ITEMS);
+
                     write(fr,&api_return,sizeof(info));
 
                 }else if(strcmp(api.cmd.name,"lival") == 0){
 
+                    char max_val[20] = "0";
+                    int counter = 0;
+                    strcpy(max_val,api.cmd.command+6);
+
                     api_return.status = ITEM_INFO;
-                    strcpy(api_return.message,"<SERVER>LIVAL EXECUTED!");
+                    strcpy(api_return.message,"<SERVER>ITEMS (value)!");
+
+                    int value = atoi(max_val);
+
+
+                    for(int i=0;i<MAX_ITEMS;i++){
+            
+                        if(itemsList[i].current_price <= value){
+                            api_return.items[i] = itemsList[i];
+                            counter ++;
+                        }
+                        
+                    }
+
+                    if(counter == 0)
+                         strcpy(api_return.message,NONE_ITEMS);
+
                     write(fr,&api_return,sizeof(info));
 
                 }else if(strcmp(api.cmd.name,"litime") == 0){
 
+                    char time[20] = "0";
+                    int counter = 0;
+                    strcpy(time,api.cmd.command+6);
+
                     api_return.status = ITEM_INFO;
-                    strcpy(api_return.message,"<SERVER>LITIME EXECUTED!");
+                    strcpy(api_return.message,"<SERVER>ITEMS (time)!");
+
+                    int value = atoi(time);
+
+                    for(int i=0;i<MAX_ITEMS;i++){
+            
+                        if(itemsList[i].time_left <= value){
+                            api_return.items[i] = itemsList[i];
+                            counter ++;
+                        }
+                        
+                    }
+
+                    if(counter == 0)
+                         strcpy(api_return.message,NONE_ITEMS);
+
                     write(fr,&api_return,sizeof(info));
 
                 }else if(strcmp(api.cmd.name,"time") == 0){
 
+                    char msg[MSG_TAM];
+
+                    sprintf(msg,"<SERVER>CURRENT TIME -> %d seconds",TIME);
                     api_return.status = INFO;
-                    strcpy(api_return.message,"<SERVER>TIME EXECUTED!");
+                    strcpy(api_return.message,msg);
                     write(fr,&api_return,sizeof(info));
 
                 }else if(strcmp(api.cmd.name,"buy") == 0){
@@ -332,21 +409,45 @@ int main(int argc, char *argv[], char **envp)
                     write(fr,&api_return,sizeof(info));
 
                 }else if(strcmp(api.cmd.name,"cash")== 0) {
+                    
+                    int user_cash;
+                    char msg[MSG_TAM];
+
+                    user_cash = get_cash_by_pid((client *)&users,api.pid);
 
                     api_return.status = INFO;
-                    strcpy(api_return.message,"<SERVER>CASH EXECUTED!");
+                    sprintf(msg,"<SERVER>YOUR CASH -> %d €",user_cash);
+                    strcpy(api_return.message,msg);
                     write(fr,&api_return,sizeof(info));
 
                 }else if(strcmp(api.cmd.name,"add") == 0 ){
+                    
+                    char total_to_add[20];
+                    int value;
 
+                    strcpy(total_to_add,api.cmd.command+4);
+                    value = atoi(total_to_add);
+
+                    for(int i=0;i <MAX_USERS;i++){
+                         if(users[i].pid == api.pid){
+                            users[i].balance += value;
+                         }
+
+                    }
+                    
                     api_return.status = INFO;
-                    strcpy(api_return.message,"<SERVER>ADD EXECUTED!");
+                    strcpy(api_return.message,"<SERVER>ADDED CASH TO YOUR ACCOUNT!");
                     write(fr,&api_return,sizeof(info));
 
                 }else if(strcmp(api.cmd.name,"list") == 0){
 
                     api_return.status = ITEM_INFO;
-                    strcpy(api_return.message,"<SERVER>list EXECUTED!");
+                    strcpy(api_return.message,ALL_ITEMS_INFO);
+
+                    for(int i=0;i<MAX_ITEMS;i++)
+                        api_return.items[i] = itemsList[i];
+                    
+
                     write(fr,&api_return,sizeof(info));
 
                 }
@@ -706,6 +807,14 @@ void fill_users(client *users){
     }
 }
 
+int get_cash_by_pid(client *users, int pid){
+
+    for(int i = 0;i<MAX_USERS;i++)
+        if(users[i].pid == pid)
+            return users[i].balance;
+
+    return 0;
+}
 
 void init_env_var(){
     setenv("FPROMOTERS", "promo.txt", 0);

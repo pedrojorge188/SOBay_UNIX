@@ -21,7 +21,6 @@
 #define WRONG_VALUES "COMMAND (%s) VALUE ERROR!\n"
 
 //Const's files
-#define MAX_ITEMS 30
 #define MAX_PROMOS 10
 #define NPROMOTERS 10
 #define RANGE 500
@@ -49,17 +48,6 @@ typedef struct client{
 }client;
 
 
-typedef struct items{
-    int id;
-    char name[20];
-    char category[20];
-    char username_owner[20];
-    char username_best_option[20];
-    int buy_now_price;
-    int current_price;
-    bool sell_state;
-    int time_left;
-}items;
 
 typedef struct{
     char fifo_name[15];
@@ -86,5 +74,6 @@ void fill_users(client *users);
 void fill_items(items *items);
 int get_ind(client *users);
 int get_ind_items(items *items);
+int get_cash_by_pid(client *users,int pid);
 
 #endif
