@@ -342,9 +342,42 @@ int main(int argc, char *argv[], char **envp)
 
                 if(strcmp(api.cmd.name,"sell") == 0){
                     
-                    api_return.status = INFO;
+                    char *token;
+                    char name[50],category[50],owner[50];
+                    int current_price,buy_now_price,time_left;
+                    int ind;
 
-                    strcpy(api_return.message,"<SERVER>SELL EXECUTED!");
+                    for(int i=0;i<MAX_USERS;i++)
+                        if(users[i].pid == api.pid)
+                            strcpy(owner,users[i].name);
+                    
+
+                    token = strtok(api.cmd.command,SPACE);
+                    token = strtok(NULL,SPACE);
+                    strcpy(name,token);
+                    token = strtok(NULL,SPACE);
+                    strcpy(category,token);
+                    token = strtok(NULL,SPACE);
+                    current_price = atoi(token);
+                    token = strtok(NULL,SPACE);
+                    buy_now_price = atoi(token);
+                    token = strtok(NULL,"\0");
+                    time_left = atoi(token);
+
+                    ind = get_ind_items((items*)&itemsList);
+
+                    itemsList[ind].id = ind+1;
+                    strcpy(itemsList[ind].name,name);
+                    strcpy(itemsList[ind].category,category);
+                    strcpy(itemsList[ind].username_best_option,"none");
+                    strcpy(itemsList[ind].username_owner,owner);
+                    itemsList[ind].current_price = current_price;
+                    itemsList[ind].buy_now_price = buy_now_price;
+                    itemsList[ind].time_left = time_left;
+                    itemsList[ind].sell_state = true;
+
+                    api_return.status = INFO;
+                    strcpy(api_return.message,"<SERVER>ITEM ADDED!");
                     write(fr,&api_return,sizeof(info));
 
                 }else if(strcmp(api.cmd.name,"licat") == 0){
