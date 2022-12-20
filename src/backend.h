@@ -77,5 +77,6 @@ int get_ind(client *users);
 int get_ind_items(items *items);
 int get_cash_by_pid(client *users,int pid);
 void action_turn(client *users,items *items);
+void save_file_items(items *item);
 
 #endif

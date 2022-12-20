@@ -113,7 +113,6 @@ static void* actionTurn(void* data){
             
         }
     }
-
     pthread_exit(NULL);
 
 }
@@ -123,7 +122,7 @@ static void* Timer(void *data){
         sleep(1);
         TIME++;
     }
-
+    
     pthread_exit(NULL);
 }
 
@@ -149,10 +148,10 @@ int main(int argc, char *argv[], char **envp)
     sigaction(SIGINT,&sa,NULL);
     sigaction(SIGUSR1,&sa,NULL);
 
-    fill_users((client *)&users);
-    fill_items((items *)&itemsList);
+    fill_users(users);
+    fill_items(itemsList);
     
-    nItems = load_items((items *)&itemsList);
+    nItems = load_items(itemsList);
 
     setbuf(stdout,NULL);
 
@@ -188,7 +187,7 @@ int main(int argc, char *argv[], char **envp)
 
     do{ 
         signal(SIGINT,handle_quit);
-
+         save_file_items(itemsList);
         fd = open(FIFO_SRV,O_RDWR);
 
         if(fd == -1){
@@ -602,6 +601,7 @@ int main(int argc, char *argv[], char **envp)
         setbuf(stdin, NULL);
         close(fd);
 
+        
     }while(command != "close");
      
     out = 1;
@@ -618,7 +618,37 @@ int main(int argc, char *argv[], char **envp)
 
     return 0;
 }
+void save_file_items(items *item){
 
+    char *itemsFileName = getenv("FITEMS");
+    FILE *save;
+    save = fopen(itemsFileName,"w");
+    
+    if(save == NULL)
+        printf(FILE_ERROR);
+
+
+    for(int i=0;i<MAX_ITEMS;i++){
+
+        if(item[i].sell_state == true){
+
+            fprintf(save,"%d %s %s %d %d %d %s %s\n",
+                    item[i].id,
+                    item[i].name,
+                    item[i].category,
+                    item[i].current_price,
+                    item[i].buy_now_price,
+                    item[i].time_left,
+                    item[i].username_owner,
+                    item[i].username_best_option
+            );
+
+        }
+    }
+
+    fclose(save);
+
+} 
 int load_items(items *itemsList){
     char *itemsFileName = getenv("FITEMS");
     
