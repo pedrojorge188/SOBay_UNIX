@@ -26,7 +26,7 @@
 #define PROMOTOR_INFO 2
 #define LOGIN_INFO 2
 #define INFO 3
-#define N_THREADS 3
+#define N_THREADS 4
 #define ALL_ITEMS_INFO "<SERVER>All Items!"
 #define NONE_ITEMS "<SERVER>ANY ITEMS TO LIST!\n"
 #define TIME_INFO "<SERVER>TIME!"

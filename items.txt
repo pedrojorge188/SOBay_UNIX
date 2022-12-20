@@ -1,7 +1,7 @@
-1 icetea bebidas 10 15 100 pedro antonio 
-2 camisa roupa 12 18 100 rodrigo antonio 
-3 cozinha casa 40 30 100 pedro antonio 
-4 casaco roupa 80 110 100 pedro antonio 
-5 meias roupa 49 70 100 pedro antonio 
-6 teste teste 20 20 20 teste teste
-7 banana fruta 5 16 190 gustavo none
+1 icetea bebidas 5 10 30 pedro none 
+2 camisa roupa 12 18 100 rodrigo none 
+3 cozinha casa 40 30 10 pedro none 
+4 casaco roupa 80 110 21 pedro none 
+5 meias roupa 49 70 44 pedro none
+6 teste teste 20 20 21 teste none
+7 banana fruta 5 16 18 gustavo none

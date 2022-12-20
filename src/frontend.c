@@ -200,14 +200,14 @@ int main(int argc, char **argv) {
 
                     if(api_recive.items[i].sell_state == true){
 
-                        printf("ID: %d ",api_recive.items[i].id);
-                        printf("NAME: %s ",api_recive.items[i].name);
-                        printf("CAT: %s ",api_recive.items[i].category);
-                        printf("PRICE: %d ",api_recive.items[i].current_price);
-                        printf("CURRENT PRICE: %d ",api_recive.items[i].buy_now_price);
-                        printf("TIME LEFT: %d ",api_recive.items[i].time_left);
-                        printf("OWNER: %s ",api_recive.items[i].username_owner);
-                        printf("BEST OFFER: %s \n",api_recive.items[i].username_best_option);
+                        printf("(ID: %d) ",api_recive.items[i].id);
+                        printf("(NAME: %s) ",api_recive.items[i].name);
+                        printf("(CAT: %s) ",api_recive.items[i].category);
+                        printf("(PRICE: %d) ",api_recive.items[i].current_price);
+                        printf("(CURRENT PRICE: %d) ",api_recive.items[i].buy_now_price);
+                        printf("(TIME LEFT: %d) ",api_recive.items[i].time_left);
+                        printf("(OWNER: %s) ",api_recive.items[i].username_owner);
+                        printf("(BEST OFFER: %s) \n",api_recive.items[i].username_best_option);
                     }
                 }
 

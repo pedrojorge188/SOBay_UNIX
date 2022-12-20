@@ -52,6 +52,7 @@ typedef struct client{
 typedef struct{
     char fifo_name[15];
     client *users;
+    items *item;
 }args_thread;
 
 typedef struct promoter{
@@ -75,5 +76,6 @@ void fill_items(items *items);
 int get_ind(client *users);
 int get_ind_items(items *items);
 int get_cash_by_pid(client *users,int pid);
+void action_turn(client *users,items *items);
 
 #endif

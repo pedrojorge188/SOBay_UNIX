@@ -72,6 +72,52 @@ static void* checkLife(void* data){
 
 }
 
+static void* actionTurn(void* data){
+
+    args_thread *args = (args_thread *)data;
+
+    int ind = -1;
+    int fMsg;
+    char fifo_cli[50];
+    char msg[60];
+    info api;
+
+    while(out == 0){
+        sleep(3);
+        for(int i = 0; i < MAX_ITEMS ; i++){
+            
+            if(args->item[i].time_left == 0 && args->item[i].sell_state == true){
+
+                for(int j=0;j<MAX_USERS;j++)
+                    if(strcmp(args->users[j].name,args->item[i].username_best_option) == 0)
+                        ind = j;
+    
+                
+                if(ind != -1){
+                    args->users[ind].balance = args->users[ind].balance - args->item[i].current_price;
+
+                    sprintf(fifo_cli,FIFO_CLI,args->users[ind].pid);
+                    sprintf(msg,"<SERVER> YOU WIN THE BID (PRODUCT:%s)",args->item[i].name);
+
+                    fMsg = open(fifo_cli,O_WRONLY);
+                    api.status = INFO;
+                    strcpy(api.message,msg);
+                    write(fMsg,&api,sizeof(api));
+                    close(fMsg);
+                }
+
+                args->item[i].sell_state = false;
+
+            }else if(args->item[i].time_left > 0 && args->item[i].sell_state == true)
+                args->item[i].time_left --;
+            
+        }
+    }
+
+    pthread_exit(NULL);
+
+}
+
 static void* Timer(void *data){
     while(out == 0){
         sleep(1);
@@ -127,6 +173,7 @@ int main(int argc, char *argv[], char **envp)
         printf("Error on timer thread creation\n");
 
     args.users = users;
+    args.item = itemsList;
     strcpy(args.fifo_name,FIFO_BEAT);
 
 
@@ -136,7 +183,10 @@ int main(int argc, char *argv[], char **envp)
     if(pthread_create(&threadId[2],NULL,timeKill,(void *)&users) != 0)
         printf("Error on timeKill thread creation\n");
 
-    do{
+    if(pthread_create(&threadId[3],NULL,actionTurn,(void*)&args) != 0)
+         printf("Error on actionTurn thread creation\n");
+
+    do{ 
         signal(SIGINT,handle_quit);
 
         fd = open(FIFO_SRV,O_RDWR);
@@ -403,9 +453,63 @@ int main(int argc, char *argv[], char **envp)
                     write(fr,&api_return,sizeof(info));
 
                 }else if(strcmp(api.cmd.name,"buy") == 0){
+                    
+                    char *token;
+                    int id_item,value,cash,item_ind,user_ind,counter = 0;
+                    char cli_state[30];
+
+                    token = strtok(api.cmd.command,SPACE);
+                    token = strtok(NULL,SPACE);
+                    id_item = atoi(token);
+                    token = strtok(NULL,"\0");
+                    value = atoi(token);
+
+                    cash = get_cash_by_pid((client *)&users,api.pid);
+
+                    for(int i=0;i<MAX_ITEMS;i++){
+                            if(itemsList[i].id == id_item && itemsList[i].sell_state == true){
+                                item_ind = i;
+                                counter++;
+                            }
+                    }
+
+                    for(int i=0;i<MAX_USERS;i++)
+                        if(users[i].pid == api.pid)
+                            user_ind = i;
+
+                    if(cash > 0){
+                        
+                        if(counter == 0){
+
+                            strcpy(api_return.message,"<SERVER>ITEM ID INVALID!");
+
+                        }else if(value >= itemsList[item_ind].buy_now_price){
+                            
+                            if((cash - value) >= 0){
+
+                                users[user_ind].balance -= value;
+                                strcpy(itemsList[item_ind].username_owner,users[user_ind].name);
+                                strcpy(itemsList[item_ind].username_best_option,users[user_ind].name); 
+                                itemsList[item_ind].sell_state = false;
+
+                                strcpy(api_return.message,"<SERVER>YOU BOUGHT ITEM!");
+
+                            }else{
+                                strcpy(api_return.message,"<SERVER>YOU DONT HAVE ENOUGHT MONEY!");
+                            }
+
+                        }else if(value > itemsList[item_ind].current_price){
+
+                             strcpy(itemsList[item_ind].username_best_option,users[user_ind].name);
+                             itemsList[item_ind].current_price = value;
+                             strcpy(api_return.message,"<SERVER>YOU MADE A BID");
+                        }
+
+                    }else{
+                         strcpy(api_return.message,"<SERVER>YOU DONT HAVE ANY CASH!");
+                    }
 
                     api_return.status = INFO;
-                    strcpy(api_return.message,"<SERVER>BUY EXECUTED!");
                     write(fr,&api_return,sizeof(info));
 
                 }else if(strcmp(api.cmd.name,"cash")== 0) {
@@ -539,14 +643,14 @@ void list_items(items *itemsList,int nItems){
 
         if(itemsList[i].sell_state == true){
 
-            printf("ID: %d ",itemsList[i].id);
-            printf("NAME: %s ",itemsList[i].name);
-            printf("CAT: %s ",itemsList[i].category);
-            printf("PRICE: %d ",itemsList[i].current_price);
-            printf("CURRENT PRICE: %d ",itemsList[i].buy_now_price);
-            printf("TIME LEFT: %d ",itemsList[i].time_left);
-            printf("OWNER: %s ",itemsList[i].username_owner);
-            printf("BEST OFFER: %s \n",itemsList[i].username_best_option);
+            printf("(ID: %d) ",itemsList[i].id);
+            printf("(NAME: %s) ",itemsList[i].name);
+            printf("(CAT: %s) ",itemsList[i].category);
+            printf("(PRICE: %d) ",itemsList[i].current_price);
+            printf("(CURRENT PRICE: %d) ",itemsList[i].buy_now_price);
+            printf("(TIME LEFT: %d) ",itemsList[i].time_left);
+            printf("(OWNER: %s) ",itemsList[i].username_owner);
+            printf("(BEST OFFER: %s) \n",itemsList[i].username_best_option);
 
         }
     }
