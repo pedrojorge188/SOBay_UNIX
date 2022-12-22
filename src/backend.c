@@ -18,13 +18,13 @@ void handle_quit(int sig){
 
 static void* timeKill(void* data){
     client *args = (client *)data;
-
+    char *heartbeat = getenv("HEARTBEAT");
     int timeKill = 0; 
 
     while(out == 0){
 
         if(timeKill == 0){
-            timeKill = TIME + 5;
+            timeKill = TIME + atoi(heartbeat);
         }
 
         if(TIME == timeKill){
@@ -38,7 +38,7 @@ static void* timeKill(void* data){
                 args[i].signal = 0;
             }
 
-            timeKill = TIME + 5;
+            timeKill = TIME + atoi(heartbeat);
         }
     }
 
@@ -83,7 +83,7 @@ static void* actionTurn(void* data){
     info api;
 
     while(out == 0){
-        sleep(3);
+        sleep(1);
         for(int i = 0; i < MAX_ITEMS ; i++){
             
             if(args->item[i].time_left == 0 && args->item[i].sell_state == true){
@@ -108,8 +108,16 @@ static void* actionTurn(void* data){
 
                 args->item[i].sell_state = false;
 
-            }else if(args->item[i].time_left > 0 && args->item[i].sell_state == true)
+            }else if(args->item[i].time_left > 0 && args->item[i].sell_state == true){
                 args->item[i].time_left --;
+
+                if(args->item[i].time_promotion > 0){
+                    args->item[i].time_promotion--;
+                }else if(args->item[i].time_promotion == 0){
+                    args->item[i].buy_now_price = args->item[i].buy_now_price + (args->item[i].value_promotion/100);
+                }
+            }
+
             
         }
     }
@@ -126,11 +134,82 @@ static void* Timer(void *data){
     pthread_exit(NULL);
 }
 
+static void* promoterAction(void *data){
+
+    char *promoter1;
+    int f1;
+    char mensage_promoter[20];
+
+    fd_set fds;
+    args_promoter *args = (args_promoter *)data;
+
+    printf("<SERVER> PROMOTERS RUNNING\n");
+
+        promoter1 = "./promotor_oficial";
+
+        int tube[2];
+        
+        pipe(tube);
+
+        if(fork() == 0){
+            
+            close(1);
+            dup(tube[WR]);
+            close(tube[WR]);
+            close(tube[RD]);
+            
+            execlp(promoter1,promoter1,NULL);
+            
+        }else{
+
+            close(tube[WR]);
+
+            while(out == 0){
+                char *token;
+                char cat[20];
+                int promotion,time;
+
+                if( (f1 = read(tube[RD],mensage_promoter,sizeof(mensage_promoter))) >= 0){
+                    
+                    token = strtok(mensage_promoter,SPACE);
+                    strcpy(cat,token);
+                    token = strtok(NULL,SPACE);
+                    promotion = atoi(token);
+                    token = strtok(NULL,"\0");
+                    time = atoi(token);
+
+                    for(int i = 0; i < MAX_ITEMS;i ++){
+
+                        if((strcmp(args->item[i].category,cat) == 0) && (args->item->sell_state == true)){
+
+                            printf("\n<SERVER> PROMOTER ACTIVE! \n");
+                            printf("->category:%s\n",cat);
+                            printf("->promotion:%d\n",promotion);
+                            printf("->duration: %d\n\n",time);
+
+                            args->item[i].buy_now_price = args->item[i].buy_now_price - (args->item[i].buy_now_price/promotion);
+                            args->item[i].time_promotion = time;
+                            args->item[i].value_promotion = promotion;
+
+                            if(args->item[i].buy_now_price < 0)
+                                args->item[i].buy_now_price = 0;
+
+                        }
+                    }
+                }
+
+            }
+            
+            close(tube[RD]);
+        }
+
+    }
+
 int main(int argc, char *argv[], char **envp)
 {      
     init_env_var();
 
-    int res,nBytes,fd,nItems;
+    int res,nBytes,fd,nPromos,nItems;
     char command[MSG_TAM],fifo_cli[50];
     
     items itemsList[MAX_ITEMS];
@@ -139,9 +218,12 @@ int main(int argc, char *argv[], char **envp)
     user userData;
     fd_set fds;
     client users[MAX_USERS];
-    
+    promoter promo[MAX_PROMOS];
+
     args_thread args;
+    args_promoter args_promo;
     pthread_t threadId[N_THREADS];
+    pthread_t promtoThread;
 
     struct sigaction sa;
     sa.sa_handler = signal_handler;
@@ -150,11 +232,12 @@ int main(int argc, char *argv[], char **envp)
 
     fill_users(users);
     fill_items(itemsList);
+    fill_promos(promo);
     
     nItems = load_items(itemsList);
+    nPromos = getPromoters(promo);
 
     setbuf(stdout,NULL);
-
 
     if(access(FIFO_SRV, F_OK) != 0) {
         mkfifo(FIFO_SRV, 0666);
@@ -184,10 +267,20 @@ int main(int argc, char *argv[], char **envp)
 
     if(pthread_create(&threadId[3],NULL,actionTurn,(void*)&args) != 0)
          printf("Error on actionTurn thread creation\n");
+    
+    args_promo.users = users;
+    args_promo.item = itemsList;
+    args_promo.prom = promo;
+
+    pthread_create(&promtoThread,NULL,promoterAction,(void*)&args_promo);
+
 
     do{ 
+
         signal(SIGINT,handle_quit);
-         save_file_items(itemsList);
+        save_file_items(itemsList);
+        save_users_file();
+
         fd = open(FIFO_SRV,O_RDWR);
 
         if(fd == -1){
@@ -226,7 +319,15 @@ int main(int argc, char *argv[], char **envp)
 
                     if(strcmp(command,"kick") == 0)
                         kick_user(command + 5,(client *)&users);
-
+                    
+                    if(strcmp(command, "prom") == 0)
+                        listPromos(promo);
+                    
+                    if(strcmp(command, "reprom") == 0){
+                        fill_promos(promo);
+                        nPromos = getPromoters(promo);
+                    }
+                    
 
                 }
                 
@@ -521,6 +622,7 @@ int main(int argc, char *argv[], char **envp)
 
                                 users[user_ind].balance -= value;
                                 strcpy(itemsList[item_ind].username_owner,users[user_ind].name);
+                                updateUserBalance(users[user_ind].name,users[user_ind].balance);
                                 strcpy(itemsList[item_ind].username_best_option,users[user_ind].name); 
                                 itemsList[item_ind].sell_state = false;
 
@@ -567,6 +669,7 @@ int main(int argc, char *argv[], char **envp)
                     for(int i=0;i <MAX_USERS;i++){
                          if(users[i].pid == api.pid){
                             users[i].balance += value;
+                            updateUserBalance(users[i].name,users[i].balance);
                          }
 
                     }
@@ -605,6 +708,9 @@ int main(int argc, char *argv[], char **envp)
     }while(command != "close");
      
     out = 1;
+
+    pthread_kill(promtoThread,SIGUSR1);
+    pthread_join(promtoThread,NULL);
 
     for(int i=0;i<N_THREADS;i++)
         pthread_kill(threadId[i],SIGUSR1);
@@ -649,6 +755,12 @@ void save_file_items(items *item){
     fclose(save);
 
 } 
+void save_users_file(){
+
+    char *fileName = getenv("FUSERS");
+    saveUsersFile(fileName);
+
+}
 int load_items(items *itemsList){
     char *itemsFileName = getenv("FITEMS");
     
@@ -719,7 +831,7 @@ void list_items(items *itemsList,int nItems){
     }
 }
 
-int getPromoters(){
+int getPromoters(promoter *promo){
 
     char *promoFileName = getenv("FPROMOTERS");
     FILE * f;
@@ -733,14 +845,15 @@ int getPromoters(){
     
     while(fgets(Buffer,sizeof(Buffer),f)){
 
-        namePromoters[prom] = Buffer;
+        strcpy(promo[prom].name,Buffer);
+        promo[prom].signal = 1;
         prom++;
 
     }
 
     fclose(f);
     
-    return 1;
+    return prom;
 }
 
 void list_users(client *users){
@@ -958,6 +1071,17 @@ void fill_items(items *items){
         items[i].username_owner[0] = 'd';
         items[i].username_best_option[0] = 'd';
         items[i].sell_state = false;
+        items[i].time_promotion = 0;
+        items[i].value_promotion = 0;
+    }
+
+}
+
+void fill_promos( promoter *promo){
+
+    for(int i= 0;i <MAX_PROMOS;i++){
+        promo[i].name[0] = 'd';
+        promo[i].signal = 0;
     }
 }
 
@@ -983,8 +1107,23 @@ int get_cash_by_pid(client *users, int pid){
     return 0;
 }
 
+void listPromos(promoter *promo){
+
+
+    printf("<SERVER> ACTIVE PROMOTERS\n");
+
+    for(int i=0;i<MAX_PROMOS;i++){
+
+        if(promo[i].signal == 1){
+            printf("->%s\n",promo[i].name);
+        }
+
+    }
+}
+
 void init_env_var(){
     setenv("FPROMOTERS", "promo.txt", 0);
     setenv("FITEMS","items.txt", 0);
     setenv("FUSERS","users.txt", 0);
+    setenv("HEARTBEAT","5", 0);
 }

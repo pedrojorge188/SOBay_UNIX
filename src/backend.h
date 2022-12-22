@@ -36,7 +36,6 @@ int WRONG = 0;
 
 /*Reading Defauls*/
 int pidUsers[RANGE];
-char *namePromoters[NPROMOTERS];
 
 /*Setup all data structs*/
 typedef struct client{
@@ -48,18 +47,23 @@ typedef struct client{
 }client;
 
 
-
 typedef struct{
     char fifo_name[15];
     client *users;
     items *item;
 }args_thread;
 
+
 typedef struct promoter{
-    char *category;
-    int promotion;
-    int duration;
+    char name[50];
+    int signal;
 }promoter;
+
+typedef struct{
+    client *users;
+    items *item;
+    promoter *prom;
+}args_promoter;
 
 
 int setup_command(char *command);
@@ -73,10 +77,14 @@ void disconnect_users();
 void kick_user(char *username,client *users);
 void fill_users(client *users);
 void fill_items(items *items);
+void fill_promos(promoter *promo);
+int getPromoters(promoter *promo);
 int get_ind(client *users);
 int get_ind_items(items *items);
 int get_cash_by_pid(client *users,int pid);
 void action_turn(client *users,items *items);
 void save_file_items(items *item);
+void save_users_file();
+void listPromos(promoter *promo);
 
 #endif

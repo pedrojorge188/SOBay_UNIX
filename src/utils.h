@@ -26,7 +26,7 @@
 #define PROMOTOR_INFO 2
 #define LOGIN_INFO 2
 #define INFO 3
-#define N_THREADS 3
+#define N_THREADS 4
 #define ALL_ITEMS_INFO "<SERVER>All Items!"
 #define NONE_ITEMS "<SERVER>ANY ITEMS TO LIST!\n"
 #define TIME_INFO "<SERVER>TIME!"
@@ -50,6 +50,8 @@ typedef struct items{
     int current_price;
     bool sell_state;
     int time_left;
+    int time_promotion;
+    int value_promotion;
 }items;
 
 typedef struct{

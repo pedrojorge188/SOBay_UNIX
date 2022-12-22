@@ -1,2 +1,2 @@
 ./promotor_oficial
-./black_list
+./black_friday
