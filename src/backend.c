@@ -7,12 +7,13 @@ void handle_quit(int sig){
 
     unlink(FIFO_SRV);
     unlink(FIFO_BEAT);
+    disconnect_users();
     puts("\n<SERVER> CLOSING ...");
 
     out = 1;
+    outProm = 1;
 
-    disconnect_users();
-
+    sleep(10);
     exit(1);
 }
 
@@ -109,12 +110,17 @@ static void* actionTurn(void* data){
                 args->item[i].sell_state = false;
 
             }else if(args->item[i].time_left > 0 && args->item[i].sell_state == true){
+
                 args->item[i].time_left --;
 
                 if(args->item[i].time_promotion > 0){
+
                     args->item[i].time_promotion--;
-                }else if(args->item[i].time_promotion == 0){
-                    args->item[i].buy_now_price = args->item[i].buy_now_price + (args->item[i].value_promotion/100);
+
+                }else if(args->item[i].time_promotion == 1){
+
+                    args->item[i].buy_now_price = args->item[i].buy_now_price + args->item[i].value_promotion;
+                    
                 }
             }
 
@@ -164,7 +170,7 @@ static void* promoterAction(void *data){
 
             close(tube[WR]);
 
-            while(out == 0){
+            while(outProm == 0){
                 char *token;
                 char cat[20];
                 int promotion,time;
@@ -182,12 +188,8 @@ static void* promoterAction(void *data){
 
                         if((strcmp(args->item[i].category,cat) == 0) && (args->item->sell_state == true)){
 
-                            printf("\n<SERVER> PROMOTER ACTIVE! \n");
-                            printf("->category:%s\n",cat);
-                            printf("->promotion:%d\n",promotion);
-                            printf("->duration: %d\n\n",time);
 
-                            args->item[i].buy_now_price = args->item[i].buy_now_price - (args->item[i].buy_now_price/promotion);
+                            args->item[i].buy_now_price = args->item[i].buy_now_price - promotion;
                             args->item[i].time_promotion = time;
                             args->item[i].value_promotion = promotion;
 
@@ -327,6 +329,12 @@ int main(int argc, char *argv[], char **envp)
                         fill_promos(promo);
                         nPromos = getPromoters(promo);
                     }
+
+                    if(strcmp(command, "cancel") == 0){
+                        // int promoter_to_close = command+7;
+                        outProm = 1;
+                    }
+
                     
 
                 }
@@ -879,48 +887,6 @@ void list_users(client *users){
 
 }
 
-int run_promoter(char *promoterName)
-{
-    char *promoter1;
-    char mensage_promoter[20];
-
-    //getPromoters(); // Na meta 2 vamos usar para ler o ficheiro promoters
-
-    promoter1 = "./black_friday";
-
-    int tube[2];
-    
-    pipe(tube);
-
-    if(fork() == 0){
-        
-        close(1);
-        dup(tube[WR]);
-        close(tube[WR]);
-        close(tube[RD]);
-        
-        execlp(promoter1,promoter1,NULL);
-        
-    }else{
-
-        close(tube[WR]);
-
-        while(1){
-
-            if(read(tube[RD],mensage_promoter,sizeof(mensage_promoter)) >= 0){
-
-                for(int i=0;i<strlen(mensage_promoter)-1;i++)
-                    printf("%c",mensage_promoter[i]);
-
-                printf("->PROMOTER RECIVED!\n");
-            }
-
-        }
-        
-        close(tube[RD]);
-    }
-    
-}
 
 int setup_command(char *command)
 {
@@ -929,6 +895,7 @@ int setup_command(char *command)
     int ind = -1;
     int any = 0;
     int counter = 0;
+
 
     token = strtok(command, SPACE);
 
@@ -939,6 +906,7 @@ int setup_command(char *command)
         disconnect_users();
         exit(EXIT_SUCCESS);
     }
+
 
     for (int i = 0; i < NUMBER_OF_COMMANDS; i++)
     {

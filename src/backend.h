@@ -35,6 +35,7 @@ char SPACE[] = {" "};
 int WRONG = 0;
 
 /*Reading Defauls*/
+int outProm = 0;
 int pidUsers[RANGE];
 
 /*Setup all data structs*/
